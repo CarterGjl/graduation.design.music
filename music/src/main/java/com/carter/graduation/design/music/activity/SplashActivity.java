@@ -2,7 +2,10 @@ package com.carter.graduation.design.music.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -28,6 +31,12 @@ public class SplashActivity extends Activity {
                 goHome();
             }
         },SPLASH_DELAY_MILLS);*/
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
         LinearLayout llSplash;
         llSplash = findViewById(R.id.ll_splash);
         RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation

@@ -2,12 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.carter.graduation.design.music.fragment.BaseFragment">
+    tools:context="com.carter.graduation.design.music.fragment.MusicDynamicFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="abc" />
+        android:text="摇一摇换歌曲单" />
 
 </FrameLayout>
