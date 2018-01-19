@@ -1,27 +1,18 @@
 package com.carter.graduation.design.music.activity;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -30,7 +21,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +49,7 @@ public class HomeDetailActivity extends AppCompatActivity
     private CustomViewPager mMainViewPager;
     private ArrayList<MusicInfo> mMusicInfos;
     private long time = 0;
+    private MusicFragment mMusicFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,23 +93,6 @@ public class HomeDetailActivity extends AppCompatActivity
                 mMainViewPager.setCurrentItem(0);
             }
         });
-        if (ContextCompat.checkSelfPermission(HomeDetailActivity.this, Manifest.permission
-                .READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(HomeDetailActivity.this, new String[]{Manifest
-                    .permission.READ_EXTERNAL_STORAGE}, 1);
-        } else {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mMusicInfos = scanAllMusicFiles();
-                    for (int i = 0; i < 5; i++) {
-                        Log.d(TAG, "onCreate: " + mMusicInfos.get(i).getTitle());
-                    }
-                }
-            }).start();
-
-
-        }
 
 
     }
@@ -127,11 +101,13 @@ public class HomeDetailActivity extends AppCompatActivity
         tabs.add(barnet);
         tabs.add(barmusic);
         mMainViewPager = findViewById(R.id.main_viewpager);
-        MusicFragment musicFragment = new MusicFragment(mMusicInfos);
+        //MusicFragment musicFragment = new MusicFragment();
         MusicDynamicFragment musicDynamicFragment = new MusicDynamicFragment();
         MainViewPagerAdapter pagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(musicDynamicFragment);
-        pagerAdapter.addFragment(musicFragment);
+        onFragmentInteraction();
+        mMusicFragment = new MusicFragment();
+        pagerAdapter.addFragment(mMusicFragment);
 
 //        添加music页面 和  摇动界面
         mMainViewPager.setAdapter(pagerAdapter);
@@ -209,8 +185,9 @@ public class HomeDetailActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.nav_about_app) {
+            Intent intent = new Intent(this, AboutAppActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -230,11 +207,11 @@ public class HomeDetailActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);/*
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mMusicInfos = scanAllMusicFiles();
+                    //mMusicInfos = scanAllMusicFiles();
                 } else {
                     showDialog();
                     //Toast.makeText(this, "本app需要此权限否则无法使用", Toast.LENGTH_SHORT).show();
@@ -243,6 +220,7 @@ public class HomeDetailActivity extends AppCompatActivity
             default:
                 break;
         }
+*/
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         if (fragments != null) {
             for (Fragment fragment : fragments) {
@@ -254,33 +232,10 @@ public class HomeDetailActivity extends AppCompatActivity
 
     }
 
-    private void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.create()
-                .setIcon(R.drawable.icon);
-        builder.setCancelable(false)
-                .setMessage("本app需要此权限否则无法使用")
-                .setPositiveButton("允许", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        ActivityCompat.requestPermissions(HomeDetailActivity.this, new String[]{Manifest
-                                .permission.READ_EXTERNAL_STORAGE}, 1);
-                    }
-                });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(HomeDetailActivity.this, "本app需要此权限否则无法使用,请前往系统设置开启",
-                        Toast
-                                .LENGTH_SHORT).show();
-            }
-        });
-        builder.show();
-    }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onFragmentInteraction() {
+//        mMusicFragment = MusicFragment.newInstance(mMusicInfos, "音乐");
     }
 
     @Override
@@ -333,48 +288,6 @@ public class HomeDetailActivity extends AppCompatActivity
         mNm.cancel(1);
     }
 
-    public ArrayList<MusicInfo> scanAllMusicFiles() {
-        ArrayList<MusicInfo> musicInfos = new ArrayList<>();
-        Cursor cursor = getContentResolver().query
-                (MediaStore.Audio
-                                .Media.EXTERNAL_CONTENT_URI, null, null, null,
-                        MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        assert cursor != null;
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        ._ID));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ALBUM));
-               /* int albumId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ALBUM_ID));
-                String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ARTIST));*/
-                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .DATA));
-                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .DURATION));
-                long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .SIZE));
-                if (size > 1024 * 80) {
-                    //大于80k
-                    MusicInfo musicInfo = new MusicInfo();
-                    musicInfo.setId(id);
-                    musicInfo.setAlbum(album);
-                    musicInfo.setDuration(duration);
-                    musicInfo.setSize(size);
-                    musicInfo.setTitle(title);
-                    musicInfo.setUrl(url);
-                    musicInfos.add(musicInfo);
-                }
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return musicInfos;
-    }
 
     static class MainViewPagerAdapter extends FragmentPagerAdapter {
 
