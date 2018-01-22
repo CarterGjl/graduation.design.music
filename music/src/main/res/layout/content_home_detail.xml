@@ -19,5 +19,6 @@
             android:layout_height="match_parent">
 
         </com.carter.graduation.design.music.widget.CustomViewPager>
+
     </android.support.v7.widget.CardView>
 </android.support.constraint.ConstraintLayout>

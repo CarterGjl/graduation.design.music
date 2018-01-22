@@ -3,10 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.carter.graduation.design.music.activity.AboutAppActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="以后完成" />
-</>
+</LinearLayout>

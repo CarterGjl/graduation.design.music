@@ -7,7 +7,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,15 +25,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
+import com.carter.graduation.design.music.activity.PlayDetailActivity;
+import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.utils.MusicUtils;
+import com.carter.graduation.design.music.utils.SpUtils;
 import com.carter.graduation.design.music.utils.UiUtil;
 
 import java.util.ArrayList;
+
+import cn.sharesdk.onekeyshare.OnekeyShare;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,8 +57,7 @@ public class MusicFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "MusicFragment";
-    // TODO: 2018/1/19 需要在系统文件中获取是否是第一次使用第一次使用需要弹出扫描音乐的对话框
-    private boolean isFirstUse = true;
+    private int currentPos = 0;
     private ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSplMusic;
     private OnFragmentInteractionListener mListener;
@@ -68,7 +76,10 @@ public class MusicFragment extends Fragment {
                     MusicInfoAdapter musicInfoAdapter = new MusicInfoAdapter(mMusicInfos);
                     mRvSongListView.setAdapter(musicInfoAdapter);
                     //musicInfoAdapter.notifyDataSetChanged();
-                    mProgressDialog.dismiss();
+                    if (mProgressDialog != null) {
+                        mProgressDialog.dismiss();
+                    }
+
                     mSplMusic.setRefreshing(false);
                     break;
                 default:
@@ -78,6 +89,9 @@ public class MusicFragment extends Fragment {
 
         }
     };
+    private ImageView mIvImage;
+    private TextView mTvContent;
+
     public MusicFragment() {
     }
 
@@ -128,9 +142,12 @@ public class MusicFragment extends Fragment {
                     .permission.READ_EXTERNAL_STORAGE}, 1);
         } else {
             //扫描本地歌曲库并显示  注意需要权限
-            if (isFirstUse) {
+            if (((boolean) SpUtils.get(mContext, GlobalConstants.IS_FIRST_USE, true))) {
                 showProgressDialog();
                 scanLocalMusic();
+                SpUtils.put(mContext, GlobalConstants.IS_FIRST_USE, false);
+            } else {
+                loadLocalMusic();
             }
 
         }
@@ -158,6 +175,20 @@ public class MusicFragment extends Fragment {
         }).start();
     }
 
+    private void loadLocalMusic() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mMusicInfos = MusicUtils.scanAllMusicFiles();
+                for (int i = 0; i < 5; i++) {
+                    Log.d(TAG, "MusicFragment onCreate: " + mMusicInfos.get(i).getTitle());
+                }
+                Message obtain = Message.obtain();
+                obtain.what = SCAN_MUSIC_LIST;
+                mHandler.sendEmptyMessage(SCAN_MUSIC_LIST);
+            }
+        }).start();
+    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -170,6 +201,40 @@ public class MusicFragment extends Fragment {
             public void onRefresh() {
                 showProgressDialog();
                 scanLocalMusic();
+            }
+        });
+        mIvImage = (ImageView) view.findViewById(R.id.widget_image);
+        mTvContent = (TextView) view.findViewById(R.id.widget_content);
+        ProgressBar pbProgress = (ProgressBar) view.findViewById(R.id.widget_progress);
+        ImageView ivPre = (ImageView) view.findViewById(R.id.widget_pre);
+        ImageView ivPlay = (ImageView) view.findViewById(R.id.widget_play);
+        ImageView ivNext = (ImageView) view.findViewById(R.id.widget_next);
+        ivPre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentPos > 0) {
+                    currentPos--;
+                }
+            }
+        });
+        mIvImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, PlayDetailActivity.class);
+                startActivity(intent);
+
+            }
+        });
+        ivPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: 2018/1/22 音乐播放
+            }
+        });
+        ivNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
         return view;
@@ -238,11 +303,41 @@ public class MusicFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(mContext, "本app需要此权限否则无法使用,请前往系统设置开启",
-                        Toast
-                                .LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
+                getAppDetailSettingIntent();
+
             }
         });
         builder.show();
+    }
+
+    private void getAppDetailSettingIntent() {
+        Intent localIntent = new Intent();
+        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+        localIntent.setData(Uri.fromParts("package", mContext.getPackageName(), null));
+        startActivity(localIntent);
+    }
+
+    private void showShare(String info) {
+        OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+
+        // title标题，微信、QQ和QQ空间等平台使用
+        //oks.setTitle(getString());
+        // titleUrl QQ和QQ空间跳转链接
+        oks.setTitle("来自carter的分享");
+        oks.setTitleUrl("http://www.baidu.com");
+        // text是分享文本，所有平台都需要这个字段
+        oks.setText(info);
+        // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+        //oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
+        // url在微信、微博，Facebook等平台中使用
+        oks.setUrl("http://sharesdk.cn");
+        // comment是我对这条分享的评论，仅在人人网使用
+        // 启动分享GUI
+        oks.show(mContext);
     }
 
     /**
@@ -264,7 +359,7 @@ public class MusicFragment extends Fragment {
 
         private ArrayList<MusicInfo> musicInfos;
 
-        public MusicInfoAdapter(ArrayList<MusicInfo> musicInfos) {
+        MusicInfoAdapter(ArrayList<MusicInfo> musicInfos) {
             this.musicInfos = musicInfos;
         }
 
@@ -280,16 +375,32 @@ public class MusicFragment extends Fragment {
             return new ViewHolder(view);
         }
 
+
         @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
-            MusicInfo musicInfo = musicInfos.get(position);
+        public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+            final MusicInfo musicInfo = musicInfos.get(position);
             holder.tvTitle.setText(musicInfo.getTitle());
             holder.tvArtist.setText(musicInfo.getAlbum());
+            holder.ivMusic.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
+                    musicInfo.getAlbum_id(), true, true));
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // TODO: 2018/1/19 需要完成音乐播放模块 需要时间构思
                     Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
                             .LENGTH_SHORT).show();
+                    mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
+                            musicInfo.getAlbum_id(), true, true));
+                    mTvContent.setText(musicInfo.getTitle());
+
+
+                }
+            });
+            holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    showShare(musicInfo.getTitle());
+                    return true;
                 }
             });
         }
@@ -303,13 +414,14 @@ public class MusicFragment extends Fragment {
             CardView cardView;
             TextView tvTitle;
             TextView tvArtist;
-
+            ImageView ivMusic;
             ViewHolder(View itemView) {
                 super(itemView);
 
                 cardView = (CardView) itemView;
                 tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
                 tvArtist = (TextView) itemView.findViewById(R.id.tv_artist);
+                ivMusic = (ImageView) itemView.findViewById(R.id.iv_music_album);
             }
         }
     }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:layout_margin="3dp"
+    android:background="@color/widget_background_color"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/widget_image"
+        android:layout_width="65dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="6dp"
+        android:contentDescription="@string/music_image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder_disk_play_program" />
+
+    <TextView
+        android:id="@+id/widget_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_toEndOf="@+id/widget_image"
+        android:singleLine="true"
+        android:textColor="@color/white_text"
+        android:textSize="13sp" />
+
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/widget_content"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/widget_image"
+        android:progress="10"
+        android:progressDrawable="@drawable/widget_progressbar" />
+
+    <ImageView
+        android:id="@+id/widget_theme"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="26dp"
+        android:layout_toEndOf="@+id/widget_image"
+        android:contentDescription="@string/theme"
+        android:src="@drawable/widget_switch_selector" />
+
+    <LinearLayout
+        android:id="@+id/widget_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/widget_theme"
+        android:layout_toStartOf="@+id/widget_love"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/widget_pre"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/pre_music"
+            android:src="@drawable/widget_pre_selector" />
+
+        <ImageView
+            android:id="@+id/widget_play"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/music_play"
+            android:src="@drawable/widget_play_selector" />
+
+        <ImageView
+            android:id="@+id/widget_next"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:contentDescription="@string/next_music"
+            android:src="@drawable/widget_next_selector" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/widget_love"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="26dp"
+        android:contentDescription="@string/love_music"
+        android:src="@drawable/widget_star_selector" />
+</RelativeLayout>

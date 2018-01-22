@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <nine-patch
+            android:dither="true"
+            android:src="@drawable/desk_bar_bg" />
+    </item>
+    <item android:id="@android:id/progress">
+        <clip
+            android:clipOrientation="horizontal"
+            android:drawable="@drawable/desk_bar_curr"
+            android:gravity="left" />
+    </item>
+</layer-list>

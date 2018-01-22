@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:name">
         <activity android:name=".activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,15 +26,18 @@
         <activity
             android:name=".activity.HomeDetailActivity"
             android:label="@string/title_activity_home_detail"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AboutAppActivity"
-            android:label="关于作者：">
+            android:label="关于作者：" />
 
-        </activity>
+        <service
+            android:name=".service.MusicPlayerService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".activity.PlayDetailActivity"></activity>
     </application>
 
 </manifest>

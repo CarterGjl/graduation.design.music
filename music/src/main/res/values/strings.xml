@@ -6,6 +6,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_share">分享</string>
+    <string name="next_music">下一曲</string>
+    <string name="love_music">喜爱music</string>
+    <string name="music_play">music_play</string>
+    <string name="pre_music">上一曲</string>
+    <string name="theme">theme</string>
+    <string name="music_image">music_image</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -24,6 +24,7 @@ public class MusicInfo implements Parcelable {
             musicInfo.size = in.readLong();
             musicInfo.url = in.readString();
             musicInfo.title = in.readString();
+            musicInfo.album_id = in.readInt();
             return musicInfo;
         }
 
@@ -36,6 +37,7 @@ public class MusicInfo implements Parcelable {
     private String title;
     //专辑名字
     private String album;
+    private int album_id;
     private String url;
     private int duration;
     private long size;
@@ -53,6 +55,7 @@ public class MusicInfo implements Parcelable {
         parcel.writeInt(id);
         parcel.writeInt(duration);
         parcel.writeLong(size);
+        parcel.writeInt(album_id);
     }
 
     public int getId() {
@@ -101,5 +104,13 @@ public class MusicInfo implements Parcelable {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public int getAlbum_id() {
+        return album_id;
+    }
+
+    public void setAlbum_id(int album_id) {
+        this.album_id = album_id;
     }
 }

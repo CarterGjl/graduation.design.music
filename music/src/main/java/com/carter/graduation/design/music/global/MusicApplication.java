@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Process;
 
+import com.mob.MobSDK;
+
 
 public class MusicApplication extends Application {
 
@@ -30,5 +32,6 @@ public class MusicApplication extends Application {
         mContext = getApplicationContext();
         mHandler = new Handler();
         mMainThreadId = Process.myTid();
+        MobSDK.init(this);
     }
 }

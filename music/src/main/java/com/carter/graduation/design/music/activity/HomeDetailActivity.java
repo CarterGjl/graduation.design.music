@@ -84,6 +84,7 @@ public class HomeDetailActivity extends AppCompatActivity
         barmusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //默认页面
                 mMainViewPager.setCurrentItem(1);
             }
         });
@@ -105,7 +106,6 @@ public class HomeDetailActivity extends AppCompatActivity
         MusicDynamicFragment musicDynamicFragment = new MusicDynamicFragment();
         MainViewPagerAdapter pagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(musicDynamicFragment);
-        onFragmentInteraction();
         mMusicFragment = new MusicFragment();
         pagerAdapter.addFragment(mMusicFragment);
 
