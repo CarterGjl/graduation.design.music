@@ -1,15 +1,15 @@
 package com.carter.graduation.design.music.activity;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,10 +29,16 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
+import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
 import com.carter.graduation.design.music.info.MusicInfo;
+import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.widget.CustomViewPager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +56,29 @@ public class HomeDetailActivity extends AppCompatActivity
     private ArrayList<MusicInfo> mMusicInfos;
     private long time = 0;
     private MusicFragment mMusicFragment;
+    private String mPath;
+    private MusicPlayerService.MusicBinder mBinder;
+    private int mDuration;
+    private int mCurrentPosition;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mBinder = (MusicPlayerService.MusicBinder) iBinder;
+            mDuration = mBinder.getDuration();
+            mCurrentPosition = mBinder.getCurrentPosition();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_detail);
+        EventBus.getDefault().register(this);
         barnet = (ImageView) findViewById(R.id.bar_net);
         barmusic = (ImageView) findViewById(R.id.bar_music);
 
@@ -66,8 +90,9 @@ public class HomeDetailActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
+                init("/storage/emulated/0/netease/cloudmusic/Music/凤凰传奇 徐千雅 - 天下的姐妹.mp3");
             }
         });
 
@@ -232,7 +257,6 @@ public class HomeDetailActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public void onFragmentInteraction() {
 //        mMusicFragment = MusicFragment.newInstance(mMusicInfos, "音乐");
@@ -259,36 +283,31 @@ public class HomeDetailActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        setNotification();
-    }
-
-    private void setNotification() {
-        mNm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Intent intent = new Intent(this, HomeDetailActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
-
-        Notification notification = new Notification.Builder(this)
-                .setContentTitle("music running")
-                .setContentText("别摸我 摸我咬你 (￢_￢)智商三岁")
-                .setWhen(System.currentTimeMillis())
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon))
-                .setSmallIcon(R.drawable.small_icon)
-                .setContentIntent(pi)
-                .setOngoing(true)
-                .build();
-
-        if (mNm != null) {
-            mNm.notify(1, notification);
-        }
+        //setNotification();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mNm.cancel(1);
+        EventBus.getDefault().unregister(this);
+        // mNm.cancel(1);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetMusicEvent(MusicEvent event) {
+        mPath = event.getPath();
+        init(mPath);
+    }
 
+    public void init(String url) {
+        Intent intent = new Intent(this, MusicPlayerService.class);
+        intent.putExtra("url", url);
+        intent.putExtra("MSG", "0");
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
+    }
+
+    public
     static class MainViewPagerAdapter extends FragmentPagerAdapter {
 
         ArrayList<Fragment> mFragments = new ArrayList<>();

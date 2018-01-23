@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -32,11 +33,15 @@ import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.PlayDetailActivity;
+import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
+import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.utils.MusicUtils;
 import com.carter.graduation.design.music.utils.SpUtils;
 import com.carter.graduation.design.music.utils.UiUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -64,6 +69,17 @@ public class MusicFragment extends Fragment {
     private ArrayList<MusicInfo> mMusicInfos;
     private Context mContext;
     private RecyclerView mRvSongListView;
+    private ImageView mIvImage;
+    private TextView mTvContent;
+    private ImageView mIvNext;
+    private ImageView mIvPlay;
+    private ImageView mIvPre;
+    private ProgressBar mPbProgress;
+    private MusicPlayerService.MusicBinder mBinder;
+    private int mCurrentPosition;
+    private int mDuration;
+    private Intent mIntent;
+    private MusicInfoAdapter mMusicInfoAdapter;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -73,13 +89,12 @@ public class MusicFragment extends Fragment {
                     mRvSongListView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     //获取传递的数据
 
-                    MusicInfoAdapter musicInfoAdapter = new MusicInfoAdapter(mMusicInfos);
-                    mRvSongListView.setAdapter(musicInfoAdapter);
+                    mMusicInfoAdapter = new MusicInfoAdapter(mMusicInfos);
+                    mRvSongListView.setAdapter(mMusicInfoAdapter);
                     //musicInfoAdapter.notifyDataSetChanged();
                     if (mProgressDialog != null) {
                         mProgressDialog.dismiss();
                     }
-
                     mSplMusic.setRefreshing(false);
                     break;
                 default:
@@ -89,8 +104,7 @@ public class MusicFragment extends Fragment {
 
         }
     };
-    private ImageView mIvImage;
-    private TextView mTvContent;
+
 
     public MusicFragment() {
     }
@@ -103,7 +117,6 @@ public class MusicFragment extends Fragment {
      * @param param2     Parameter 2.
      * @return A new instance of fragment MusicFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
         MusicFragment fragment = new MusicFragment();
         Bundle args = new Bundle();
@@ -196,51 +209,18 @@ public class MusicFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_music, container, false);
         mRvSongListView = view.findViewById(R.id.rv_song_list);
         mSplMusic = (SwipeRefreshLayout) view.findViewById(R.id.spl_refresh_music);
-        mSplMusic.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                showProgressDialog();
-                scanLocalMusic();
-            }
-        });
+
         mIvImage = (ImageView) view.findViewById(R.id.widget_image);
         mTvContent = (TextView) view.findViewById(R.id.widget_content);
-        ProgressBar pbProgress = (ProgressBar) view.findViewById(R.id.widget_progress);
-        ImageView ivPre = (ImageView) view.findViewById(R.id.widget_pre);
-        ImageView ivPlay = (ImageView) view.findViewById(R.id.widget_play);
-        ImageView ivNext = (ImageView) view.findViewById(R.id.widget_next);
-        ivPre.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (currentPos > 0) {
-                    currentPos--;
-                }
-            }
-        });
-        mIvImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mContext, PlayDetailActivity.class);
-                startActivity(intent);
-
-            }
-        });
-        ivPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: 2018/1/22 音乐播放
-            }
-        });
-        ivNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+        mPbProgress = (ProgressBar) view.findViewById(R.id.widget_progress);
+        mIvPre = (ImageView) view.findViewById(R.id.widget_pre);
+        mIvPlay = (ImageView) view.findViewById(R.id.widget_play);
+        mIvNext = (ImageView) view.findViewById(R.id.widget_next);
+        mIntent = new Intent(mContext, PlayDetailActivity.class);
+        initClick();
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed() {
         if (mListener != null) {
             mListener.onFragmentInteraction();
@@ -302,16 +282,23 @@ public class MusicFragment extends Fragment {
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(mContext, "本app需要此权限否则无法使用,请前往系统设置开启",
-                        Toast.LENGTH_SHORT).show();
-                getAppDetailSettingIntent();
+                /*Toast.makeText(mContext, "本app需要此权限否则无法使用,请前往系统设置开启",
+                        Toast.LENGTH_SHORT).show();*/
+                Snackbar.make(mRvSongListView, "本app需要此权限否则无法使用,请前往系统设置开启", Snackbar.LENGTH_LONG)
+                        .setAction("允许使用权限", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                goToSetting();
+                            }
+                        }).show();
+
 
             }
         });
         builder.show();
     }
 
-    private void getAppDetailSettingIntent() {
+    private void goToSetting() {
         Intent localIntent = new Intent();
         localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
@@ -323,41 +310,76 @@ public class MusicFragment extends Fragment {
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
-
         // title标题，微信、QQ和QQ空间等平台使用
         //oks.setTitle(getString());
         // titleUrl QQ和QQ空间跳转链接
         oks.setTitle("来自carter的分享");
-        oks.setTitleUrl("http://www.baidu.com");
+        //oks.setTitleUrl("http://www.baidu.com");
         // text是分享文本，所有平台都需要这个字段
         oks.setText(info);
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         //oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
         // url在微信、微博，Facebook等平台中使用
-        oks.setUrl("http://sharesdk.cn");
+        //oks.setUrl("http://sharesdk.cn");
         // comment是我对这条分享的评论，仅在人人网使用
         // 启动分享GUI
         oks.show(mContext);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    private void initClick() {
+
+        mSplMusic.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                showProgressDialog();
+                scanLocalMusic();
+            }
+        });
+        mIvPre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentPos > 0) {
+                    currentPos--;
+                }
+            }
+        });
+        mIvImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(mIntent);
+
+            }
+        });
+        mIvPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: 2018/1/22 音乐播放
+            }
+        });
+        mIvNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction();
     }
 
     private class MusicInfoAdapter extends RecyclerView.Adapter<MusicInfoAdapter.ViewHolder> {
 
         private ArrayList<MusicInfo> musicInfos;
+        private boolean isPlaying = false;
+        private int currentMusicID = -1;
+
 
         MusicInfoAdapter(ArrayList<MusicInfo> musicInfos) {
             this.musicInfos = musicInfos;
@@ -370,14 +392,11 @@ public class MusicFragment extends Fragment {
                 mContext = parent.getContext();
             }
             View view = LayoutInflater.from(mContext).inflate(R.layout.list_music_info, parent, false);
-
-
             return new ViewHolder(view);
         }
 
-
         @Override
-        public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+        public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
             final MusicInfo musicInfo = musicInfos.get(position);
             holder.tvTitle.setText(musicInfo.getTitle());
             holder.tvArtist.setText(musicInfo.getAlbum());
@@ -387,11 +406,24 @@ public class MusicFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     // TODO: 2018/1/19 需要完成音乐播放模块 需要时间构思
-                    Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
-                            .LENGTH_SHORT).show();
-                    mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
-                            musicInfo.getAlbum_id(), true, true));
-                    mTvContent.setText(musicInfo.getTitle());
+                    if (isPlaying && currentMusicID == musicInfo.getId()) {
+                        mContext.startActivity(mIntent);
+                    } else {
+                        Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
+                                .LENGTH_SHORT).show();
+                        mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
+                                musicInfo.getAlbum_id(), true, true));
+                        mTvContent.setText(musicInfo.getTitle());
+                        holder.ivPlayState.setVisibility(View.VISIBLE);
+                        Log.d(TAG, "onClick: " + musicInfo.getUrl());
+                        //playMusic(musicInfo.getUrl());
+                        MusicEvent instance = MusicEvent.getInstance();
+                        instance.setPath(musicInfo.getUrl());
+                        EventBus.getDefault().post(instance);
+                        //更改状态
+                        currentMusicID = musicInfo.getId();
+                        isPlaying = true;
+                    }
 
 
                 }
@@ -415,6 +447,7 @@ public class MusicFragment extends Fragment {
             TextView tvTitle;
             TextView tvArtist;
             ImageView ivMusic;
+            private ImageView ivPlayState;
             ViewHolder(View itemView) {
                 super(itemView);
 
@@ -422,6 +455,7 @@ public class MusicFragment extends Fragment {
                 tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
                 tvArtist = (TextView) itemView.findViewById(R.id.tv_artist);
                 ivMusic = (ImageView) itemView.findViewById(R.id.iv_music_album);
+                ivPlayState = (ImageView) itemView.findViewById(R.id.play_state);
             }
         }
     }

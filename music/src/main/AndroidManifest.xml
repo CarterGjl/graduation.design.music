@@ -35,9 +35,15 @@
         <service
             android:name=".service.MusicPlayerService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.carter.graduation.design.music.service.MusicPlayerService"></action>
+            </intent-filter>
+        </service>
 
-        <activity android:name=".activity.PlayDetailActivity"></activity>
+        <activity android:name=".activity.PlayDetailActivity">
+
+        </activity>
     </application>
 
 </manifest>
