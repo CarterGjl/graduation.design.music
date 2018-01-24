@@ -1,9 +1,10 @@
 package com.carter.graduation.design.music.activity;
 
-import android.app.NotificationManager;
+import android.bluetooth.BluetoothHeadset;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,17 +29,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.carter.graduation.design.music.HeadsetReceiver;
 import com.carter.graduation.design.music.R;
-import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
-import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.widget.CustomViewPager;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +46,10 @@ public class HomeDetailActivity extends AppCompatActivity
     private static final String TAG = "HomeDetailActivity";
     private ArrayList<ImageView> tabs = new ArrayList<>();
     private ImageView barnet, barmusic;
-    private NotificationManager mNm;
     private ShareActionProvider mShareActionProvider;
     private CustomViewPager mMainViewPager;
-    private ArrayList<MusicInfo> mMusicInfos;
     private long time = 0;
     private MusicFragment mMusicFragment;
-    private String mPath;
     private MusicPlayerService.MusicBinder mBinder;
     private int mDuration;
     private int mCurrentPosition;
@@ -78,10 +71,10 @@ public class HomeDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_detail);
-        EventBus.getDefault().register(this);
         barnet = (ImageView) findViewById(R.id.bar_net);
         barmusic = (ImageView) findViewById(R.id.bar_music);
-
+        bindService();
+        bindReceiver();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -92,7 +85,6 @@ public class HomeDetailActivity extends AppCompatActivity
             public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                init("/storage/emulated/0/netease/cloudmusic/Music/凤凰传奇 徐千雅 - 天下的姐妹.mp3");
             }
         });
 
@@ -121,6 +113,14 @@ public class HomeDetailActivity extends AppCompatActivity
         });
 
 
+    }
+
+    private void bindReceiver() {
+        HeadsetReceiver headsetReceiver = new HeadsetReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+        intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
+        registerReceiver(headsetReceiver, intentFilter);
     }
 
     private void setViewPager() {
@@ -286,25 +286,15 @@ public class HomeDetailActivity extends AppCompatActivity
         //setNotification();
     }
 
+
+    public void bindService() {
+        Intent intent = new Intent(this, MusicPlayerService.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
-        // mNm.cancel(1);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onGetMusicEvent(MusicEvent event) {
-        mPath = event.getPath();
-        init(mPath);
-    }
-
-    public void init(String url) {
-        Intent intent = new Intent(this, MusicPlayerService.class);
-        intent.putExtra("url", url);
-        intent.putExtra("MSG", "0");
-        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-
     }
 
     public

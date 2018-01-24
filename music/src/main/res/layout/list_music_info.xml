@@ -22,9 +22,7 @@
             android:layout_centerVertical="true"
             android:gravity="center"
             android:paddingEnd="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/song_play_icon"
-            android:visibility="gone" />
+            android:scaleType="centerInside" />
         <ImageView
             android:id="@+id/iv_music_album"
             android:layout_width="60dp"

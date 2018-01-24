@@ -33,32 +33,31 @@ import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.PlayDetailActivity;
+import com.carter.graduation.design.music.event.HeadsetEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
-import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.utils.MusicUtils;
 import com.carter.graduation.design.music.utils.SpUtils;
 import com.carter.graduation.design.music.utils.UiUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
+
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MusicFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MusicFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * 音乐播放界面
  */
 public class MusicFragment extends Fragment {
 
 
     private static final int SCAN_MUSIC_LIST = 1;
+    private static final int IS_PLAYING = 2;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "MusicFragment";
@@ -75,11 +74,10 @@ public class MusicFragment extends Fragment {
     private ImageView mIvPlay;
     private ImageView mIvPre;
     private ProgressBar mPbProgress;
-    private MusicPlayerService.MusicBinder mBinder;
-    private int mCurrentPosition;
     private int mDuration;
     private Intent mIntent;
     private MusicInfoAdapter mMusicInfoAdapter;
+    private int mProgress;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -97,6 +95,11 @@ public class MusicFragment extends Fragment {
                     }
                     mSplMusic.setRefreshing(false);
                     break;
+                case IS_PLAYING:
+                    mProgress = mPbProgress.getProgress();
+                    startUpdateSeekBarProgress(mProgress);
+                    mPbProgress.setProgress(mPbProgress.getProgress() + 100);
+                    break;
                 default:
                     break;
             }
@@ -104,7 +107,10 @@ public class MusicFragment extends Fragment {
 
         }
     };
-
+    private boolean isPlaying = false;
+    //当前播放音乐的路径
+    private MusicInfo mMusicInfoCurrent;
+    private int mPauseProgress;
 
     public MusicFragment() {
     }
@@ -143,6 +149,7 @@ public class MusicFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         mContext = getActivity();
         if (getArguments() != null) {
             //mMusicInfos = getArguments().getParcelableArrayList(ARG_PARAM1);
@@ -159,8 +166,12 @@ public class MusicFragment extends Fragment {
                 showProgressDialog();
                 scanLocalMusic();
                 SpUtils.put(mContext, GlobalConstants.IS_FIRST_USE, false);
+//                mMusicInfoCurrent = (String) SpUtils.get(mContext,GlobalConstants.CURRENT_MUSIC,mMusicInfos.get(0)
+//                        .getUrl());
             } else {
                 loadLocalMusic();
+//                mMusicInfoCurrent = (String) SpUtils.get(mContext,GlobalConstants.CURRENT_MUSIC,mMusicInfos.get(0)
+//                        .getUrl());
             }
 
         }
@@ -178,9 +189,6 @@ public class MusicFragment extends Fragment {
                     e.printStackTrace();
                 }
                 mMusicInfos = MusicUtils.scanAllMusicFiles();
-                for (int i = 0; i < 5; i++) {
-                    Log.d(TAG, "MusicFragment onCreate: " + mMusicInfos.get(i).getTitle());
-                }
                 Message obtain = Message.obtain();
                 obtain.what = SCAN_MUSIC_LIST;
                 mHandler.sendEmptyMessage(SCAN_MUSIC_LIST);
@@ -193,15 +201,13 @@ public class MusicFragment extends Fragment {
             @Override
             public void run() {
                 mMusicInfos = MusicUtils.scanAllMusicFiles();
-                for (int i = 0; i < 5; i++) {
-                    Log.d(TAG, "MusicFragment onCreate: " + mMusicInfos.get(i).getTitle());
-                }
                 Message obtain = Message.obtain();
                 obtain.what = SCAN_MUSIC_LIST;
                 mHandler.sendEmptyMessage(SCAN_MUSIC_LIST);
             }
         }).start();
     }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -298,6 +304,17 @@ public class MusicFragment extends Fragment {
         builder.show();
     }
 
+    private void startUpdateSeekBarProgress(int currentProgress) {
+        /*避免重复发送Message*/
+        stopUpdateSeekBarProgree();
+        mPbProgress.setProgress(currentProgress);
+        mHandler.sendEmptyMessageDelayed(IS_PLAYING, 100);
+    }
+
+    private void stopUpdateSeekBarProgree() {
+        mHandler.removeMessages(IS_PLAYING);
+    }
+
     private void goToSetting() {
         Intent localIntent = new Intent();
         localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -340,6 +357,12 @@ public class MusicFragment extends Fragment {
             public void onClick(View view) {
                 if (currentPos > 0) {
                     currentPos--;
+                    MusicInfo musicInfo = mMusicInfos.get(currentPos);
+                    mTvContent.setText(musicInfo.getTitle());
+                    mMusicInfoAdapter.setSelectItem(currentPos);
+                    playMusic(musicInfo, 0);
+                } else {
+                    Toast.makeText(mContext, "没有上一曲了，请听其他的歌曲", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -347,42 +370,149 @@ public class MusicFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(mIntent);
-
             }
         });
         mIvPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2018/1/22 音乐播放
+                if (!isPlaying) {
+                    changeMusicState();
+                    playMusic(mMusicInfoCurrent, 2);
+                } else {
+                    changeMusicState();
+                    playMusic(mMusicInfoCurrent, 1);
+                }
+
             }
         });
         mIvNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (currentPos < mMusicInfos.size()) {
+                    currentPos++;
+                    MusicInfo musicInfo = mMusicInfos.get(currentPos);
+                    mTvContent.setText(musicInfo.getTitle());
+                    mMusicInfoAdapter.setSelectItem(currentPos);
+                    playMusic(musicInfo, 0);
+                } else {
+                    Toast.makeText(mContext, "没有下一曲了，请欣赏其他歌曲", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
+    /*  private void playMusic(String path,int musicState) {
+          //单例用于
+          MusicEvent instance = MusicEvent.getInstance();
+          instance.setPath(path);
+          // 0 表示开始播放 1 暂停  2  继续
+          instance.setMusicState(musicState);
+          EventBus.getDefault().post(instance);
+      }*/
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
 
+    /**
+     * 开始播放音乐
+     *
+     * @param musicInfo  需要播放的音乐信息
+     * @param musicState 指定播放状态
+     */
+    @SuppressLint("NewApi")
+    private void playMusic(MusicInfo musicInfo, int musicState) {
+        //单例用于
+        MusicEvent instance = MusicEvent.getInstance();
+        instance.setPath(musicInfo.getUrl());
+        // 0 表示开始播放 1 暂停  2  继续
+        instance.setMusicState(musicState);
+        EventBus.getDefault().post(instance);
+//        mPbProgress.setMin(0);
+        switch (musicState) {
+            case 0:
+                mPbProgress.setMax(musicInfo.getDuration());
+                startUpdateSeekBarProgress(0);
+                break;
+            case 1:
+                mPbProgress.setMax(musicInfo.getDuration());
+                pauseUpdateSeekBarProgress();
+                break;
+            case 2:
+                mPbProgress.setMax(musicInfo.getDuration());
+                startUpdateSeekBarProgress(mPauseProgress);
+                break;
+            default:
+                break;
+        }
+
+        Log.d(TAG, "playMusic: " + musicInfo.getDuration());
+    }
+
+    private void pauseUpdateSeekBarProgress() {
+        mPauseProgress = mProgress;
+        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPauseProgress);
+        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPbProgress.getProgress());
+        mPbProgress.setProgress(mPauseProgress);
+        mHandler.removeMessages(IS_PLAYING);
+
+    }
+
+    /**
+     * 根据状态进行改变音乐是否播放的状态
+     */
+    private void changeMusicState() {
+        if (!isPlaying) {
+            mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+            isPlaying = true;
+        } else {
+            mIvPlay.setImageResource(R.drawable.widget_play_selector);
+            isPlaying = false;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetHeadsetEvent(HeadsetEvent event) {
+        int headsetState = event.getHeadsetState();
+        Log.d(TAG, "onGetHeadsetEvent: " + headsetState);
+        playMusic(mMusicInfoCurrent, headsetState);
+        changeMusicState();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetMusicEvent(MusicEvent event) {
+    }
+
+    @Override
+    public void onDestroyView() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroyView();
+    }
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction();
     }
 
-    private class MusicInfoAdapter extends RecyclerView.Adapter<MusicInfoAdapter.ViewHolder> {
+    class MusicInfoAdapter extends RecyclerView.Adapter<MusicInfoAdapter.ViewHolder> {
 
         private ArrayList<MusicInfo> musicInfos;
-        private boolean isPlaying = false;
+
         private int currentMusicID = -1;
 
+        private int defItem = -1;
 
         MusicInfoAdapter(ArrayList<MusicInfo> musicInfos) {
             this.musicInfos = musicInfos;
+        }
+
+        /**
+         * 用于给正在播放的音乐做标记
+         *
+         * @param defItem
+         */
+        public void setSelectItem(int defItem) {
+            this.defItem = defItem;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -400,32 +530,49 @@ public class MusicFragment extends Fragment {
             final MusicInfo musicInfo = musicInfos.get(position);
             holder.tvTitle.setText(musicInfo.getTitle());
             holder.tvArtist.setText(musicInfo.getAlbum());
-            holder.ivMusic.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
-                    musicInfo.getAlbum_id(), true, true));
+            if (defItem != -1) {
+                if (defItem == position) {
+                    holder.ivPlayState.setImageResource(R.drawable.song_play_icon);
+                    holder.ivPlayState.setVisibility(View.VISIBLE);
+                } else {
+                    holder.ivPlayState.setVisibility(View.GONE);
+                }
+            }
+//            holder.ivMusic.setImageResource();
+           /* Glide.with(mContext).load(MusicUtils.getArtwork(mContext, musicInfo.getId(),
+                    musicInfo.getAlbum_id(), true, true)).into(holder.ivMusic);*/
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 2018/1/19 需要完成音乐播放模块 需要时间构思
+                    currentPos = position;
+                    setSelectItem(position);
                     if (isPlaying && currentMusicID == musicInfo.getId()) {
                         mContext.startActivity(mIntent);
-                    } else {
+                    } else if (!isPlaying) {
                         Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
                                 .LENGTH_SHORT).show();
                         mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
                                 musicInfo.getAlbum_id(), true, true));
                         mTvContent.setText(musicInfo.getTitle());
-                        holder.ivPlayState.setVisibility(View.VISIBLE);
                         Log.d(TAG, "onClick: " + musicInfo.getUrl());
                         //playMusic(musicInfo.getUrl());
-                        MusicEvent instance = MusicEvent.getInstance();
-                        instance.setPath(musicInfo.getUrl());
-                        EventBus.getDefault().post(instance);
+                        //playMusic(musicInfo);
+                        playMusic(musicInfo, 0);
                         //更改状态
                         currentMusicID = musicInfo.getId();
-                        isPlaying = true;
+                        mMusicInfoCurrent = musicInfo;
+                        SpUtils.put(mContext, GlobalConstants.CURRENT_MUSIC, musicInfo.getUrl());
+                        //更改音乐播放状态
+                        changeMusicState();
+                    } else if (isPlaying && currentMusicID != musicInfo.getId()) {
+                        //playMusic(musicInfo.getUrl(),1);
+                        playMusic(musicInfo, 0);
+                        isPlaying = false;
+                        //更改当前播放音乐的 id值
+                        mTvContent.setText(musicInfo.getTitle());
+                        currentMusicID = musicInfo.getId();
+                        changeMusicState();
                     }
-
-
                 }
             });
             holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -447,7 +594,8 @@ public class MusicFragment extends Fragment {
             TextView tvTitle;
             TextView tvArtist;
             ImageView ivMusic;
-            private ImageView ivPlayState;
+            ImageView ivPlayState;
+
             ViewHolder(View itemView) {
                 super(itemView);
 

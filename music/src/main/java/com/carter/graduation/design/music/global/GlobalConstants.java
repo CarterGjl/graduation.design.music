@@ -7,4 +7,5 @@ package com.carter.graduation.design.music.global;
 
 public class GlobalConstants {
     public static final String IS_FIRST_USE = "is_first_use";
+    public static String CURRENT_MUSIC = "current_music";
 }
