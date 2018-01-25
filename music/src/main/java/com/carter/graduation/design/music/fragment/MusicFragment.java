@@ -59,8 +59,8 @@ public class MusicFragment extends Fragment {
 
     private static final int SCAN_MUSIC_LIST = 1;
     private static final int IS_PLAYING = 2;
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    /*    private static final String ARG_PARAM1 = "param1";
+        private static final String ARG_PARAM2 = "param2";*/
     private static final String TAG = "MusicFragment";
     private int currentPos = 0;
     private ProgressDialog mProgressDialog;
@@ -113,25 +113,14 @@ public class MusicFragment extends Fragment {
     private MusicInfo mMusicInfoCurrent;
     private int mPauseProgress;
 
-    public MusicFragment() {
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param musicInfos 音乐列表.
-     * @param param2     Parameter 2.
-     * @return A new instance of fragment MusicFragment.
-     */
-    public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
+  /*  public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
         MusicFragment fragment = new MusicFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_PARAM1, musicInfos);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
+    }*/
 
 
     @Override
@@ -139,11 +128,15 @@ public class MusicFragment extends Fragment {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         mContext = getActivity();
-        if (getArguments() != null) {
+        /*if (getArguments() != null) {
             //mMusicInfos = getArguments().getParcelableArrayList(ARG_PARAM1);
 //            Log.d(TAG, "onCreateView: "+mMusicInfos.get(0).getTitle());
             // mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        }*/
+        iniUse();
+    }
+
+    private void iniUse() {
         if (ContextCompat.checkSelfPermission(UiUtil.getContext(), Manifest.permission
                 .READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest
@@ -170,6 +163,17 @@ public class MusicFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_music, container, false);
+        initView(view);
+        initClick();
+        return view;
+    }
+
+    /**
+     * 初始化view
+     *
+     * @param view
+     */
+    private void initView(View view) {
         mRvSongListView = view.findViewById(R.id.rv_song_list);
         mSplMusic = (SwipeRefreshLayout) view.findViewById(R.id.spl_refresh_music);
 
@@ -180,8 +184,6 @@ public class MusicFragment extends Fragment {
         mIvPlay = (ImageView) view.findViewById(R.id.widget_play);
         mIvNext = (ImageView) view.findViewById(R.id.widget_next);
         mIntent = new Intent(mContext, PlayDetailActivity.class);
-        initClick();
-        return view;
     }
 
     /**
@@ -230,11 +232,11 @@ public class MusicFragment extends Fragment {
 
 
 
-    public void onButtonPressed() {
+ /*   public void onButtonPressed() {
         if (mListener != null) {
             mListener.onFragmentInteraction();
         }
-    }
+    }*/
 
     @Override
     public void onAttach(Context context) {
@@ -346,6 +348,9 @@ public class MusicFragment extends Fragment {
         oks.show(mContext);
     }
 
+    /**
+     * 音乐播放的按钮的点击事件
+     */
     private void initClick() {
 
         mSplMusic.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -524,9 +529,9 @@ public class MusicFragment extends Fragment {
         /**
          * 用于给正在播放的音乐做标记
          *
-         * @param defItem
+         * @param defItem 当前选中的条目
          */
-        public void setSelectItem(int defItem) {
+        void setSelectItem(int defItem) {
             this.defItem = defItem;
             notifyDataSetChanged();
         }
