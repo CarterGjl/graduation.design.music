@@ -108,12 +108,6 @@ public class MusicPlayerService extends Service implements Runnable {
             }
         });
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     /**
      * 播放音乐
      */

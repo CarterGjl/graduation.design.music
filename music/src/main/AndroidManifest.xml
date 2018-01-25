@@ -41,12 +41,14 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activity.PlayDetailActivity"></activity>
+        <activity android:name=".activity.PlayDetailActivity" />
 
         <receiver
             android:name=".HeadsetReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true">
+
+        </receiver>
     </application>
 
 </manifest>

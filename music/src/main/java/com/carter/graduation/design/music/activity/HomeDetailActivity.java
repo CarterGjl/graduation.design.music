@@ -51,14 +51,10 @@ public class HomeDetailActivity extends AppCompatActivity
     private long time = 0;
     private MusicFragment mMusicFragment;
     private MusicPlayerService.MusicBinder mBinder;
-    private int mDuration;
-    private int mCurrentPosition;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mBinder = (MusicPlayerService.MusicBinder) iBinder;
-            mDuration = mBinder.getDuration();
-            mCurrentPosition = mBinder.getCurrentPosition();
         }
 
         @Override
@@ -71,10 +67,16 @@ public class HomeDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_detail);
-        barnet = (ImageView) findViewById(R.id.bar_net);
-        barmusic = (ImageView) findViewById(R.id.bar_music);
+
         bindService();
         bindReceiver();
+        initView();
+
+    }
+
+    private void initView() {
+        barnet = (ImageView) findViewById(R.id.bar_net);
+        barmusic = (ImageView) findViewById(R.id.bar_music);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -112,9 +114,11 @@ public class HomeDetailActivity extends AppCompatActivity
             }
         });
 
-
     }
 
+    /**
+     * 绑定监听耳机状态的receiver
+     */
     private void bindReceiver() {
         HeadsetReceiver headsetReceiver = new HeadsetReceiver();
         IntentFilter intentFilter = new IntentFilter();
@@ -127,7 +131,6 @@ public class HomeDetailActivity extends AppCompatActivity
         tabs.add(barnet);
         tabs.add(barmusic);
         mMainViewPager = findViewById(R.id.main_viewpager);
-        //MusicFragment musicFragment = new MusicFragment();
         MusicDynamicFragment musicDynamicFragment = new MusicDynamicFragment();
         MainViewPagerAdapter pagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(musicDynamicFragment);
@@ -179,7 +182,6 @@ public class HomeDetailActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home_detail, menu);
         MenuItem item = menu.findItem(R.id.action_share);
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
@@ -195,7 +197,6 @@ public class HomeDetailActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_share) {
 
             return true;
@@ -287,6 +288,9 @@ public class HomeDetailActivity extends AppCompatActivity
     }
 
 
+    /**
+     * 绑定音乐播放的service
+     */
     public void bindService() {
         Intent intent = new Intent(this, MusicPlayerService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -297,8 +301,7 @@ public class HomeDetailActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    public
-    static class MainViewPagerAdapter extends FragmentPagerAdapter {
+    public static class MainViewPagerAdapter extends FragmentPagerAdapter {
 
         ArrayList<Fragment> mFragments = new ArrayList<>();
 
