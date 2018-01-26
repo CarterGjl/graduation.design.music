@@ -122,6 +122,7 @@ public class MusicFragment extends Fragment {
     //当前播放音乐的路径
     private MusicInfo mMusicInfoCurrent;
     private int mPauseProgress;
+    private int mCurrentPlayingPosition;
 
   /*  public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
         MusicFragment fragment = new MusicFragment();
@@ -630,7 +631,8 @@ public class MusicFragment extends Fragment {
                         //playMusic(musicInfo.getUrl());
                         //playMusic(musicInfo);
                         playMusic(musicInfo, MusicState.State.PLAYING);
-                        //更改状态
+                        //更改状态  当前正在播放的位置 记录
+                        mCurrentPlayingPosition = position;
                         currentMusicID = musicInfo.getId();
                         mMusicInfoCurrent = musicInfo;
                         //更改音乐播放状态
@@ -640,10 +642,32 @@ public class MusicFragment extends Fragment {
                         playMusic(musicInfo, MusicState.State.PLAYING);
                         isPlaying = false;
                         //更改当前播放音乐的 id值
+                        mCurrentPlayingPosition = position;
                         currentMusicID = musicInfo.getId();
                         mMusicInfoCurrent = musicInfo;
                         changeMusicState();
                     }
+                }
+            });
+            holder.ivMusic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "删除这首歌？", Snackbar.LENGTH_SHORT).setAction("确定", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (position < mCurrentPlayingPosition) {
+                                mMusicInfos.remove(position);
+                                notifyDataSetChanged();
+                                mCurrentPlayingPosition--;
+                                setSelectItem(mCurrentPlayingPosition);
+                            } else if (mCurrentPlayingPosition == position) {
+                                Toast.makeText(mContext, "正在播放歌曲不允许删除", Toast.LENGTH_SHORT).show();
+                            } else {
+                                mMusicInfos.remove(position);
+                                notifyDataSetChanged();
+                            }
+                        }
+                    }).show();
                 }
             });
             holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
