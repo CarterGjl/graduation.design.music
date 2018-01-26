@@ -640,8 +640,8 @@ public class MusicFragment extends Fragment {
                         playMusic(musicInfo, MusicState.State.PLAYING);
                         isPlaying = false;
                         //更改当前播放音乐的 id值
-
                         currentMusicID = musicInfo.getId();
+                        mMusicInfoCurrent = musicInfo;
                         changeMusicState();
                     }
                 }
