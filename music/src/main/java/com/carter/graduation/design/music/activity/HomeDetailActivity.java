@@ -50,11 +50,11 @@ public class HomeDetailActivity extends AppCompatActivity
     private CustomViewPager mMainViewPager;
     private long time = 0;
     private MusicFragment mMusicFragment;
-    private MusicPlayerService.MusicBinder mBinder;
+    //    private MusicPlayerService.MusicBinder mBinder;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mBinder = (MusicPlayerService.MusicBinder) iBinder;
+//            mBinder = (MusicPlayerService.MusicBinder) iBinder;
         }
 
         @Override

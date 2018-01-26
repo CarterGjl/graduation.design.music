@@ -5,25 +5,25 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.HomeDetailActivity;
 import com.carter.graduation.design.music.event.MusicEvent;
+import com.carter.graduation.design.music.event.MusicPositionEvent;
+import com.carter.graduation.design.music.player.MediaPlayerHolder;
+import com.carter.graduation.design.music.player.PlayAdapter;
+import com.carter.graduation.design.music.player.PlaybackInfoListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
-public class MusicPlayerService extends Service implements Runnable {
+public class MusicPlayerService extends Service {
 
     private static final String TAG = "MusicPlayerService";
     //通知id
@@ -31,7 +31,7 @@ public class MusicPlayerService extends Service implements Runnable {
     private static final int PLAYING = 0;
     private static final int PAUSE_PLAYING = 1;
     private static final int CONTINUE_PLAYING = 2;
-    private static MediaPlayer mMediaPlayer = null;
+    //    private static MediaPlayer mMediaPlayer = null;
     /* @SuppressLint("HandlerLeak")
      private Handler mHandler = new Handler(){
          @Override
@@ -51,11 +51,14 @@ public class MusicPlayerService extends Service implements Runnable {
      };*/
     //当前播放歌曲
     private static int currentPos;
+    private boolean isRandom = false;
+    private boolean isMusicChanged = false;
+    private boolean isMusicFinished = false;
     private Timer mTimer = new Timer();
     /**
      * 用于获取当前的播放的位置
      */
-    private TimerTask mTimerTask = new TimerTask() {
+  /*  private TimerTask mTimerTask = new TimerTask() {
         @Override
         public void run() {
             if (mMediaPlayer == null)
@@ -68,23 +71,10 @@ public class MusicPlayerService extends Service implements Runnable {
                 EventBus.getDefault().post(musicEvent);
             }
         }
-    };
-    //当前的进度条
-    private int currentPosition = 0;
-    private MusicBinder mBinder = new MusicBinder(this);
-
-    public MusicPlayerService() {
-
-    }
-
-    /**
-     * 获取当前播放的音乐
-     *
-     * @return 当前播放的位置
-     */
-    public static int getCurrentMusicPos() {
-        return currentPos;
-    }
+    };*/
+//    private MusicBinder mBinder = new MusicBinder(this);
+    private PlayAdapter mPlayAdapter;
+    private String mPath;
 
     @Override
     public void onCreate() {
@@ -92,8 +82,8 @@ public class MusicPlayerService extends Service implements Runnable {
         EventBus.getDefault().register(this);
         Log.d(TAG, "onCreate: ");
 
-
-        if (mMediaPlayer == null) {
+        initPlaybackController();
+        /*if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
         }
 
@@ -106,17 +96,25 @@ public class MusicPlayerService extends Service implements Runnable {
                 instance.setResetProgress(0);
                 EventBus.getDefault().post(instance);
             }
-        });
+        });*/
     }
+
+    private void initPlaybackController() {
+
+        MediaPlayerHolder mediaPlayerHolder = new MediaPlayerHolder(this);
+        mediaPlayerHolder.setPlaybackInfoListener(new PlaybackListener());
+        mPlayAdapter = mediaPlayerHolder;
+    }
+
     /**
      * 播放音乐
      */
-    private void player(String url, int musicState) {
+    /*private void player(String url, int musicState) {
         Log.i(TAG, "player: ");
 
         switch (musicState) {
             case PLAYING:
-                playingMusic(url);
+                playingMusic(url, false);
                 break;
             case PAUSE_PLAYING:
                 pausePlaying();
@@ -126,17 +124,17 @@ public class MusicPlayerService extends Service implements Runnable {
                 break;
             default:
                 break;
-        }
+        }*/
        /* if (musicState == 0) {
 
         } else if (musicState == 1) {
 
         } else if (musicState == 2) {
 
-        }*/
-    }
+        }
+    }*/
 
-    private void continuePlaying() {
+   /* private void continuePlaying() {
         ///继续播放
         mMediaPlayer.start();
     }
@@ -151,31 +149,18 @@ public class MusicPlayerService extends Service implements Runnable {
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(url);
-            mMediaPlayer.setLooping(true);
+//            mMediaPlayer.setLooping(true);
             mMediaPlayer.prepare();
             continuePlaying();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
+
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
-       /* mMSG = intent.getStringExtra("MSG");
-        Log.i(TAG, "onStartCommand: " + mMSG);
-        if (mMSG.equals("0")) {
-
-            String url = intent.getStringExtra("url");
-            intent.getIntExtra("currentMusicPos", 0);
-
-            Log.i(TAG, "onStartCommand: " + Thread.currentThread().getName());
-            player(url);
-        } else if (mMSG.equals("1")) {
-            mMediaPlayer.pause();
-        } else if (mMSG.equals("2")) {
-            mMediaPlayer.start();
-        }*/
         Notification notification;
 //        mNm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Intent musicIntent = new Intent(this, HomeDetailActivity.class);
@@ -193,7 +178,7 @@ public class MusicPlayerService extends Service implements Runnable {
 
         startForeground(NOTIFICATION, notification);
 //        mTimer.schedule(mTimerTask,0,1000);
-        return mBinder;
+        return null;
     }
 
     @Override
@@ -201,7 +186,8 @@ public class MusicPlayerService extends Service implements Runnable {
         return super.onUnbind(intent);
     }
 
-    @Override
+
+   /* @Override
     public void run() {
         Log.i(TAG, "run: " + Thread.currentThread().getName());
         int totalDuration = mMediaPlayer.getDuration();
@@ -218,13 +204,41 @@ public class MusicPlayerService extends Service implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 
+    /**
+     * 接收当前的music状态信息
+     *
+     * @param event 当前传递的消息
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMusicEvent(MusicEvent event) {
-        String path = event.getPath();
+        mPath = event.getPath();
         int musicState = event.getMusicState();
-        player(path, musicState);
+//        player(path, musicState); 一开始播放音乐的逻辑
+        switch (musicState) {
+            case 0:
+                //播放音乐
+                mPlayAdapter.initPreparePlay();
+                mPlayAdapter.loadMedia(mPath);
+                mPlayAdapter.play();
+                break;
+            case 1:
+                //暂停
+                mPlayAdapter.pause();
+                break;
+            case 2:
+                if (isMusicFinished) {
+                    mPlayAdapter.play();
+                    isMusicFinished = false;
+                } else {
+                    mPlayAdapter.continuePlaying();
+                }
+
+                break;
+            default:
+                break;
+        }
 //        new Thread(this).start();
     }
 
@@ -232,21 +246,57 @@ public class MusicPlayerService extends Service implements Runnable {
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        if (mMediaPlayer != null) {
+        mPlayAdapter.release();
+        /*if (mMediaPlayer != null) {
             mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
-        }
+        }*/
         //关闭线程
-        Thread.currentThread().interrupt();
+//        Thread.currentThread().interrupt();
         stopForeground(true);
     }
 
-    /**
+    private class PlaybackListener extends PlaybackInfoListener {
+        @Override
+        public void onDurationChanged(int duration) {
+            Log.d(TAG, "onDurationChanged: " + duration);
+            super.onDurationChanged(duration);
+        }
+
+        @Override
+        public void onPositionChanged(int position) {
+            Log.d(TAG, "onPositionChanged: " + position);
+            MusicPositionEvent instance = MusicPositionEvent.getInstance();
+            instance.setCurrentPosition(position);
+            EventBus.getDefault().post(instance);
+            super.onPositionChanged(position);
+        }
+
+        @Override
+        public void onStateChanged(int state) {
+            Log.d(TAG, "onStateChanged: " + state);
+            super.onStateChanged(state);
+        }
+
+        @Override
+        public void onPlaybackCompleted() {
+            MusicEvent instance = MusicEvent.getInstance();
+            instance.setResetProgress(0);
+            EventBus.getDefault().post(instance);
+            mPlayAdapter.reset(mPath);
+            Log.d(TAG, "onPlaybackCompleted: ");
+            isMusicFinished = true;
+            super.onPlaybackCompleted();
+        }
+
+    }
+/*
+    *//**
      * 获取当前播放的位置
      *
      * @return 返回当前的播放位置
-     */
+     *//*
     public int getCurrentPosition() {
         if (mMediaPlayer != null) {
             int totalDuration = mMediaPlayer.getDuration();
@@ -255,13 +305,13 @@ public class MusicPlayerService extends Service implements Runnable {
             }
         }
         return currentPosition;
-    }
+    }*/
 
-    //获取总时长
+/*    //获取总时长
     public int getDuration() {
         return mMediaPlayer.getDuration();
-    }
-
+    }*/
+/*
     public class MusicBinder extends Binder {
         //暂时不改  以后根据需求来决定
         private MusicPlayerService mService;
@@ -277,5 +327,5 @@ public class MusicPlayerService extends Service implements Runnable {
         public int getDuration() {
             return mService.getDuration();
         }
-    }
+    }*/
 }
