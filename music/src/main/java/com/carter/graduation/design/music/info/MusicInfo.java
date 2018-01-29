@@ -18,12 +18,12 @@ public class MusicInfo implements Parcelable {
         @Override
         public MusicInfo createFromParcel(Parcel in) {
             MusicInfo musicInfo = new MusicInfo();
+            musicInfo.title = in.readString();
             musicInfo.album = in.readString();
+            musicInfo.url = in.readString();
             musicInfo.id = in.readInt();
             musicInfo.duration = in.readInt();
             musicInfo.size = in.readLong();
-            musicInfo.url = in.readString();
-            musicInfo.title = in.readString();
             musicInfo.album_id = in.readInt();
             return musicInfo;
         }

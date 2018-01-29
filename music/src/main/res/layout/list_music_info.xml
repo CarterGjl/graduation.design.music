@@ -28,7 +28,8 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:contentDescription="音乐专辑图片"
-            android:src="@drawable/play_img_default" />
+            android:src="@drawable/play_img_default"
+            android:tooltipText="删除本音乐" />
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"

@@ -33,9 +33,11 @@ import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.PlayDetailActivity;
+import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.HeadsetEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
+import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.player.MusicState;
@@ -64,13 +66,13 @@ public class MusicFragment extends Fragment {
     /*    private static final String ARG_PARAM1 = "param1";
         private static final String ARG_PARAM2 = "param2";*/
     private static final String TAG = "MusicFragment";
-    private static boolean isPlaying = false;
+    //当前正在播放的音乐的位置  初始化为0
+    private static int currentPos = 0;
+    private boolean isPlaying = false;
     /**
      * 音乐是否改变了 默认改变
      */
     private boolean isMusicFinished = false;
-    //当前正在播放的音乐的位置  初始化为0
-    private int currentPos = 0;
     private ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSplMusic;
     private OnFragmentInteractionListener mListener;
@@ -313,8 +315,8 @@ public class MusicFragment extends Fragment {
         builder.show();
     }
 
-    private void startUpdateSeekBarProgress(int currentProgress) {
-        /*避免重复发送Message*/
+/*    private void startUpdateSeekBarProgress(int currentProgress) {
+        *//*避免重复发送Message*//*
         stopUpdateSeekBarProgree();
         mPbProgress.setProgress(currentProgress);
         mHandler.sendEmptyMessageDelayed(IS_PLAYING, 100);
@@ -322,7 +324,7 @@ public class MusicFragment extends Fragment {
 
     private void stopUpdateSeekBarProgree() {
         mHandler.removeMessages(IS_PLAYING);
-    }
+    }*/
 
     private void goToSetting() {
         Intent localIntent = new Intent();
@@ -389,6 +391,9 @@ public class MusicFragment extends Fragment {
         mIvImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mIntent.putExtra("duration", DurationEvent.getDuration());
+                mIntent.putExtra("musicInfo", mMusicInfoCurrent);
+                mIntent.putExtra("isPlaying", isPlaying);
                 startActivity(mIntent);
             }
         });
@@ -396,10 +401,8 @@ public class MusicFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (!isPlaying) {
-                    changeMusicState();
                     Log.d(TAG, "onClick: " + "继续");
                     playMusic(mMusicInfoCurrent, MusicState.State.CONTINUE_PLAYING);
-                    //需要多加一句。。。。
                     changeMusicState();
                     Log.d(TAG, "onClick: " + isPlaying);
                 } else {
@@ -473,45 +476,12 @@ public class MusicFragment extends Fragment {
         // 0 表示开始播放 1 暂停  2  继续
         instance.setMusicState(musicState);
         EventBus.getDefault().post(instance);
-        mPbProgress.setMax(musicInfo.getDuration());
+        DurationEvent durationEvent = DurationEvent.getInstance();
+        int duration = musicInfo.getDuration();
+        DurationEvent.setDuration(duration);
+        EventBus.getDefault().post(durationEvent);
+        mPbProgress.setMax(duration);
         Log.d(TAG, "playMusic: " + musicInfo.getDuration());
-    }
-/*    @SuppressLint("NewApi")
-    private void playMusic(MusicInfo musicInfo, int musicState) {
-        //单例用于
-        MusicEvent instance = MusicEvent.getInstance();
-        instance.setPath(musicInfo.getUrl());
-        // 0 表示开始播放 1 暂停  2  继续
-        instance.setMusicState(musicState);
-        EventBus.getDefault().post(instance);
-//        mPbProgress.setMin(0);
-        switch (musicState) {
-            case 0:
-                mPbProgress.setMax(musicInfo.getDuration());
-                startUpdateSeekBarProgress(0);
-                break;
-            case 1:
-                mPbProgress.setMax(musicInfo.getDuration());
-                pauseUpdateSeekBarProgress(mProgress);
-                break;
-            case 2:
-                mPbProgress.setMax(musicInfo.getDuration());
-                startUpdateSeekBarProgress(mPauseProgress);
-                break;
-            default:
-                break;
-        }
-
-        Log.d(TAG, "playMusic: " + musicInfo.getDuration());
-    }*/
-
-    private void pauseUpdateSeekBarProgress(int progress) {
-        mPauseProgress = progress;
-        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPauseProgress);
-        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPbProgress.getProgress());
-        mPbProgress.setProgress(progress);
-        mHandler.removeMessages(IS_PLAYING);
-
     }
 
     /**
@@ -536,11 +506,22 @@ public class MusicFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMusicFinishedEvent(MusicEvent event) {
-        if (isPlaying) {
-            changeMusicState();
+    public void onMusicFinishedEvent(MusicStateEvent stateEvent) {
+        int state = stateEvent.getState();
+        switch (state) {
+            case MusicState.State.COMPLETED:
+                if (isPlaying) {
+                    changeMusicState();
+                }
+
+                break;
+            case MusicState.State.CONTINUE_PLAYING:
+                break;
+            case MusicState.State.PAUSED:
+                break;
+            case MusicState.State.PLAYING:
+                break;
         }
-//        playMusic(randomPlayMusic(),0);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -620,6 +601,11 @@ public class MusicFragment extends Fragment {
                     currentPos = position;
                     setSelectItem(position);
                     if (isPlaying && currentMusicID == musicInfo.getId()) {
+                        mIntent.putExtra("duration", DurationEvent.getDuration());
+
+                        // TODO: 2018/1/29
+                        mIntent.putExtra("musicInfo", mMusicInfoCurrent);
+                        mIntent.putExtra("isPlaying", isPlaying);
                         mContext.startActivity(mIntent);
                     } else if (!isPlaying) {
                         Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
@@ -702,4 +688,42 @@ public class MusicFragment extends Fragment {
             }
         }
     }
+    /*    @SuppressLint("NewApi")
+    private void playMusic(MusicInfo musicInfo, int musicState) {
+        //单例用于
+        MusicEvent instance = MusicEvent.getInstance();
+        instance.setPath(musicInfo.getUrl());
+        // 0 表示开始播放 1 暂停  2  继续
+        instance.setMusicState(musicState);
+        EventBus.getDefault().post(instance);
+//        mPbProgress.setMin(0);
+        switch (musicState) {
+            case 0:
+                mPbProgress.setMax(musicInfo.getDuration());
+                startUpdateSeekBarProgress(0);
+                break;
+            case 1:
+                mPbProgress.setMax(musicInfo.getDuration());
+                pauseUpdateSeekBarProgress(mProgress);
+                break;
+            case 2:
+                mPbProgress.setMax(musicInfo.getDuration());
+                startUpdateSeekBarProgress(mPauseProgress);
+                break;
+            default:
+                break;
+        }
+
+        Log.d(TAG, "playMusic: " + musicInfo.getDuration());
+    }*/
+
+  /*  private void pauseUpdateSeekBarProgress(int progress) {
+        mPauseProgress = progress;
+        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPauseProgress);
+        Log.d(TAG, "pauseUpdateSeekBarProgress: " + mPbProgress.getProgress());
+        mPbProgress.setProgress(progress);
+        mHandler.removeMessages(IS_PLAYING);
+
+    }*/
+
 }

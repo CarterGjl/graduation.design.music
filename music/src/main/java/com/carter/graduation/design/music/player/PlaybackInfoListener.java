@@ -49,7 +49,7 @@ public abstract class PlaybackInfoListener {
 
     @IntDef({State.INVALID, State.PLAYING, State.PAUSED, State.RESET, State.COMPLETED})
     @Retention(RetentionPolicy.SOURCE)
-    @interface State {
+    public @interface State {
         int INVALID = -1;
         int PLAYING = 0;
         int PAUSED = 1;

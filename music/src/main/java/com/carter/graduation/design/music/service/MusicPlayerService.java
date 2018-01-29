@@ -10,9 +10,13 @@ import android.util.Log;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.HomeDetailActivity;
+import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
+import com.carter.graduation.design.music.event.MusicStateEvent;
+import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.player.MediaPlayerHolder;
+import com.carter.graduation.design.music.player.MusicState;
 import com.carter.graduation.design.music.player.PlayAdapter;
 import com.carter.graduation.design.music.player.PlaybackInfoListener;
 
@@ -181,10 +185,7 @@ public class MusicPlayerService extends Service {
         return null;
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
+
 
 
    /* @Override
@@ -243,6 +244,11 @@ public class MusicPlayerService extends Service {
     }
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
@@ -261,6 +267,9 @@ public class MusicPlayerService extends Service {
         @Override
         public void onDurationChanged(int duration) {
             Log.d(TAG, "onDurationChanged: " + duration);
+            DurationEvent instance = DurationEvent.getInstance();
+            instance.setDuration(duration);
+            EventBus.getDefault().post(instance);
             super.onDurationChanged(duration);
         }
 
@@ -270,23 +279,45 @@ public class MusicPlayerService extends Service {
             MusicPositionEvent instance = MusicPositionEvent.getInstance();
             instance.setCurrentPosition(position);
             EventBus.getDefault().post(instance);
+            SeekBarEvent seekBarEvent = SeekBarEvent.getInstance();
+            seekBarEvent.setSeekBarPosition(position);
+            EventBus.getDefault().post(seekBarEvent);
             super.onPositionChanged(position);
         }
 
         @Override
         public void onStateChanged(int state) {
             Log.d(TAG, "onStateChanged: " + state);
+            switch (state) {
+                default:
+                    break;
+                case State.COMPLETED:
+                    break;
+                case State.INVALID:
+                    break;
+                case State.PAUSED:
+
+                    break;
+                case State.PLAYING:
+                    MusicStateEvent stateEvent = MusicStateEvent.getInstance();
+                    stateEvent.setState(MusicState.State.PLAYING);
+                    EventBus.getDefault().post(stateEvent);
+                    break;
+                case State.RESET:
+                    break;
+            }
             super.onStateChanged(state);
         }
 
         @Override
         public void onPlaybackCompleted() {
-            MusicEvent instance = MusicEvent.getInstance();
-            instance.setResetProgress(0);
-            EventBus.getDefault().post(instance);
             mPlayAdapter.reset(mPath);
             Log.d(TAG, "onPlaybackCompleted: ");
+
             isMusicFinished = true;
+            MusicStateEvent stateEvent = MusicStateEvent.getInstance();
+            stateEvent.setState(MusicState.State.COMPLETED);
+            EventBus.getDefault().post(stateEvent);
             super.onPlaybackCompleted();
         }
 

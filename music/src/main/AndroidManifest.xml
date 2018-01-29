@@ -41,7 +41,9 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activity.PlayDetailActivity" />
+        <activity
+            android:name=".activity.PlayDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver
             android:name=".HeadsetReceiver"
