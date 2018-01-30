@@ -41,7 +41,7 @@ import java.util.List;
 
 public class HomeDetailActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MusicFragment.OnFragmentInteractionListener, MusicDynamicFragment.OnFragmentInteractionListener {
+        MusicDynamicFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "HomeDetailActivity";
     private ArrayList<ImageView> tabs = new ArrayList<>();

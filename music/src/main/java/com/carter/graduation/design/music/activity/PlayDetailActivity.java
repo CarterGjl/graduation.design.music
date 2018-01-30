@@ -12,7 +12,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.carter.graduation.design.music.R;
-import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.info.MusicInfo;
@@ -54,8 +53,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
 
     private void getSomething() {
         Intent intent = getIntent();
-        int duration = intent.getIntExtra("duration", 0);
         MusicInfo musicInfo = (MusicInfo) intent.getParcelableExtra("musicInfo");
+        int duration = musicInfo.getDuration();
         Log.d(TAG, "onStart: " + duration);
         mTvTotalTime.setText(MusicUtils.formatTime(duration));
         mTvCurrentTime.setText(MusicUtils.formatTime(currentPlayingPos));
@@ -176,7 +175,6 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetSeekBarEvent(SeekBarEvent instance) {
 
@@ -190,10 +188,6 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onGetDurationEvent(DurationEvent durationEvent) {
-
-    }
 
     @Override
     protected void onDestroy() {

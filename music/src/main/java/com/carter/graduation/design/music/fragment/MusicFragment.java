@@ -61,10 +61,11 @@ public class MusicFragment extends Fragment {
 
 
     private static final int SCAN_MUSIC_LIST = 1;
-    //    private static final int IS_PLAYING = 2;
     private static final String TAG = "MusicFragment";
     //当前正在播放的音乐的位置  初始化为0
     private static int currentPos = 0;
+    //    private static final int IS_PLAYING = 2;
+    private int currentMusicID = -1;
     private boolean isPlaying = false;
     /**
      * 音乐是否改变了 默认改变
@@ -370,6 +371,9 @@ public class MusicFragment extends Fragment {
                 if (currentPos > 0) {
                     currentPos--;
                     MusicInfo musicInfo = mMusicInfos.get(currentPos);
+                    currentMusicID = musicInfo.getId();
+                    mMusicInfoCurrent = musicInfo;
+                    Log.d(TAG, "onClick: " + currentMusicID + ":" + isPlaying);
                     mTvMusicTitle.setText(musicInfo.getTitle());
                     mMusicInfoAdapter.setSelectItem(currentPos);
                     //放在这里无效 打断点之后了解的 原因不知道
@@ -388,7 +392,6 @@ public class MusicFragment extends Fragment {
         mIvImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mIntent.putExtra("duration", DurationEvent.getDuration());
                 mIntent.putExtra("musicInfo", mMusicInfoCurrent);
                 mIntent.putExtra("isPlaying", isPlaying);
                 startActivity(mIntent);
@@ -429,9 +432,10 @@ public class MusicFragment extends Fragment {
                 if (currentPos < mMusicInfos.size() - 1) {
                     currentPos++;
                     MusicInfo musicInfo = mMusicInfos.get(currentPos);
+                    currentMusicID = musicInfo.getId();
                     mTvMusicTitle.setText(musicInfo.getTitle());
                     mMusicInfoAdapter.setSelectItem(currentPos);
-
+                    mMusicInfoCurrent = musicInfo;
                     playMusic(musicInfo, MusicState.State.PLAYING);
                     mIvPlay.setImageResource(R.drawable.widget_pause_selector);
                     isPlaying = true;
@@ -473,10 +477,11 @@ public class MusicFragment extends Fragment {
         // 0 表示开始播放 1 暂停  2  继续
         instance.setMusicState(musicState);
         EventBus.getDefault().post(instance);
-        DurationEvent durationEvent = DurationEvent.getInstance();
         int duration = musicInfo.getDuration();
+        /*DurationEvent durationEvent = DurationEvent.getInstance();
+
         DurationEvent.setDuration(duration);
-        EventBus.getDefault().post(durationEvent);
+        EventBus.getDefault().post(durationEvent);*/
         mPbProgress.setMax(duration);
         Log.d(TAG, "playMusic: " + musicInfo.getDuration());
     }
@@ -548,7 +553,7 @@ public class MusicFragment extends Fragment {
 
         private ArrayList<MusicInfo> musicInfos;
 
-        private int currentMusicID = -1;
+
 
         private int defItem = -1;
 
@@ -597,10 +602,10 @@ public class MusicFragment extends Fragment {
                 public void onClick(View view) {
                     currentPos = position;
                     setSelectItem(position);
-                    if (isPlaying && currentMusicID == musicInfo.getId()) {
+                    int id = musicInfo.getId();
+                    Log.d(TAG, "onClick: " + id);
+                    if (isPlaying && currentMusicID == id) {
                         mIntent.putExtra("duration", DurationEvent.getDuration());
-
-                        // TODO: 2018/1/29
                         mIntent.putExtra("musicInfo", mMusicInfoCurrent);
                         mIntent.putExtra("isPlaying", isPlaying);
                         mContext.startActivity(mIntent);
