@@ -29,10 +29,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.carter.graduation.design.music.HeadsetReceiver;
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
+import com.carter.graduation.design.music.receiver.HeadsetReceiver;
 import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.widget.CustomViewPager;
 

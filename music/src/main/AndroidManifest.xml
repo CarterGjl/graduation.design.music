@@ -46,10 +46,18 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver
-            android:name=".HeadsetReceiver"
+            android:name=".receiver.HeadsetReceiver"
             android:enabled="true"
             android:exported="true">
 
+        </receiver>
+        <receiver
+            android:name=".receiver.SeekPositionReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.carter.graduation.design.music" />
+            </intent-filter>
         </receiver>
     </application>
 

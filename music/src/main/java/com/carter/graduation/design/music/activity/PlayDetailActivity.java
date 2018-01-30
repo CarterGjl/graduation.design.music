@@ -112,19 +112,19 @@ public class PlayDetailActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (mUserIsSeeking) {
 
                     mUserIsSeeking = false;
-                }
-
-
+                Intent intent = new Intent("com.carter.graduation.design.music");
+                intent.putExtra("seek", userSelectedPosition);
+                Log.d(TAG, "onStopTrackingTouch: " + userSelectedPosition);
+                sendBroadcast(intent);
             }
 
-            private void seekTo() {
+          /*  private void seekTo() {
                 SeekBarEvent instance = SeekBarEvent.getInstance();
                 instance.setUserSelectedPosition(userSelectedPosition);
                 EventBus.getDefault().post(instance);
-            }
+            }*/
         });
     }
 

@@ -14,6 +14,7 @@ import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
+import com.carter.graduation.design.music.event.PositionEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.player.MediaPlayerHolder;
 import com.carter.graduation.design.music.player.MusicState;
@@ -101,6 +102,15 @@ public class MusicPlayerService extends Service {
                 EventBus.getDefault().post(instance);
             }
         });*/
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int seek = intent.getIntExtra("seek", 0);
+        if (seek != 0) {
+            mPlayAdapter.seekTo(seek);
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void initPlaybackController() {
@@ -241,6 +251,14 @@ public class MusicPlayerService extends Service {
                 break;
         }
 //        new Thread(this).start();
+    }
+
+    //有点意思  事件的重复导致的之前的问题吗？？？？？？？？？？、、、、、
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetSeekPos(PositionEvent positionEvent) {
+        int userSelectedPosition = positionEvent.getPos();
+        Log.d(TAG, "onGetSeekPos: " + userSelectedPosition);
+        mPlayAdapter.seekTo(userSelectedPosition);
     }
 
     @Override
