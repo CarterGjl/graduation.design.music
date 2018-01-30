@@ -43,7 +43,7 @@
 
         <activity
             android:name=".activity.PlayDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar1" />
 
         <receiver
             android:name=".receiver.HeadsetReceiver"
@@ -59,6 +59,8 @@
                 <action android:name="com.carter.graduation.design.music" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".activity.BaseActivity" />
     </application>
 
 </manifest>

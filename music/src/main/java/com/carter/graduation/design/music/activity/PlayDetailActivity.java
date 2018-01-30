@@ -3,7 +3,6 @@ package com.carter.graduation.design.music.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,7 +23,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class PlayDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class PlayDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "PlayDetailActivity";
     private static int currentPlayingPos = 0;

@@ -19,7 +19,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -32,6 +31,7 @@ import android.widget.Toast;
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
+import com.carter.graduation.design.music.fragment.TimingFragment;
 import com.carter.graduation.design.music.receiver.HeadsetReceiver;
 import com.carter.graduation.design.music.service.MusicPlayerService;
 import com.carter.graduation.design.music.widget.CustomViewPager;
@@ -39,7 +39,7 @@ import com.carter.graduation.design.music.widget.CustomViewPager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeDetailActivity extends AppCompatActivity
+public class HomeDetailActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MusicFragment.OnFragmentInteractionListener, MusicDynamicFragment.OnFragmentInteractionListener {
 
@@ -217,7 +217,8 @@ public class HomeDetailActivity extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-
+            TimingFragment timingFragment = new TimingFragment();
+            timingFragment.show(getFragmentManager(), "timing");
         } else if (id == R.id.nav_exit) {
             finish();
         }/* else if (id == R.id.nav_share) {

@@ -2,13 +2,12 @@ package com.carter.graduation.design.music.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.carter.graduation.design.music.R;
 
-public class AboutAppActivity extends AppCompatActivity {
+public class AboutAppActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

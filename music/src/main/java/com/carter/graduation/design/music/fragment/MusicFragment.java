@@ -50,7 +50,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
@@ -62,9 +61,7 @@ public class MusicFragment extends Fragment {
 
 
     private static final int SCAN_MUSIC_LIST = 1;
-    private static final int IS_PLAYING = 2;
-    /*    private static final String ARG_PARAM1 = "param1";
-        private static final String ARG_PARAM2 = "param2";*/
+    //    private static final int IS_PLAYING = 2;
     private static final String TAG = "MusicFragment";
     //当前正在播放的音乐的位置  初始化为0
     private static int currentPos = 0;
@@ -72,10 +69,10 @@ public class MusicFragment extends Fragment {
     /**
      * 音乐是否改变了 默认改变
      */
-    private boolean isMusicFinished = false;
+//    private boolean isMusicFinished = false;
     private ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSplMusic;
-    private OnFragmentInteractionListener mListener;
+    //    private OnFragmentInteractionListener mListener;
     private ArrayList<MusicInfo> mMusicInfos;
     private Context mContext;
     private RecyclerView mRvSongListView;
@@ -123,7 +120,7 @@ public class MusicFragment extends Fragment {
     };
     //当前播放音乐的路径
     private MusicInfo mMusicInfoCurrent;
-    private int mPauseProgress;
+    //    private int mPauseProgress;
     private int mCurrentPlayingPosition;
 
   /*  public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
@@ -247,18 +244,18 @@ public class MusicFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        /*if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
-        }
+        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+//        mListener = null;
     }
 
     @Override
@@ -537,15 +534,15 @@ public class MusicFragment extends Fragment {
         super.onDestroyView();
     }
 
-    public MusicInfo randomPlayMusic() {
+    /*public MusicInfo randomPlayMusic() {
         Random random = new Random();
         int randomMusicPos = random.nextInt(mMusicInfos.size() - 1);
         return mMusicInfos.get(randomMusicPos);
-    }
+    }*/
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction();
-    }
+   /* public interface OnFragmentInteractionListener {
+//        void onFragmentInteraction();
+    }*/
 
     class MusicInfoAdapter extends RecyclerView.Adapter<MusicInfoAdapter.ViewHolder> {
 
