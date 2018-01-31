@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.event.MusicStateEvent;
+import com.carter.graduation.design.music.event.NextMusicEvent;
+import com.carter.graduation.design.music.event.PreMusicEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.player.MusicState;
@@ -132,12 +134,16 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         switch (view.getId()) {
             case R.id.iv_pre:
                 //上一曲
+                PreMusicEvent instance = PreMusicEvent.getInstance();
+                instance.setPre(0);
+                EventBus.getDefault().post(instance);
                 break;
             case R.id.iv_play_or_pause:
                 //播放
                 break;
             case R.id.iv_next:
                 //下一曲
+                EventBus.getDefault().post(new NextMusicEvent());
                 break;
             default:
                 break;
@@ -166,7 +172,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
             case MusicState.State.PAUSED:
                 break;
             case MusicState.State.PLAYING:
-
+                mIsPlaying = true;
+                mIvPlayOrPause.setImageResource(R.drawable.widget_pause_selector);
                 break;
             case MusicState.State.COMPLETED:
                 mIsPlaying = false;

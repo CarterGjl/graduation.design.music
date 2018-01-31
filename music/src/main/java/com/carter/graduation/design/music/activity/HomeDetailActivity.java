@@ -34,7 +34,6 @@ import com.carter.graduation.design.music.fragment.MusicFragment;
 import com.carter.graduation.design.music.fragment.TimingFragment;
 import com.carter.graduation.design.music.receiver.HeadsetReceiver;
 import com.carter.graduation.design.music.service.MusicPlayerService;
-import com.carter.graduation.design.music.widget.CustomViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ public class HomeDetailActivity extends BaseActivity
     private ArrayList<ImageView> tabs = new ArrayList<>();
     private ImageView barnet, barmusic;
     private ShareActionProvider mShareActionProvider;
-    private CustomViewPager mMainViewPager;
+    private ViewPager mMainViewPager;
     private long time = 0;
     private MusicFragment mMusicFragment;
     //    private MusicPlayerService.MusicBinder mBinder;

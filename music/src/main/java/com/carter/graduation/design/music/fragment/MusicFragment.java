@@ -35,9 +35,13 @@ import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.activity.PlayDetailActivity;
 import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.HeadsetEvent;
+import com.carter.graduation.design.music.event.MusicArrayListEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
+import com.carter.graduation.design.music.event.NextMusicEvent;
+import com.carter.graduation.design.music.event.PreMusicEvent;
+import com.carter.graduation.design.music.event.RandomMusicEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.player.MusicState;
@@ -50,6 +54,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
@@ -96,6 +101,9 @@ public class MusicFragment extends Fragment {
                 case SCAN_MUSIC_LIST:
                     mRvSongListView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     //获取传递的数据
+                    MusicArrayListEvent instance = MusicArrayListEvent.getInstance();
+                    instance.setMusicInfos(mMusicInfos);
+                    EventBus.getDefault().post(instance);
                     mMusicInfoAdapter = new MusicInfoAdapter(mMusicInfos);
                     mRvSongListView.setAdapter(mMusicInfoAdapter);
                     if (mProgressDialog != null) {
@@ -161,7 +169,6 @@ public class MusicFragment extends Fragment {
             } else {
                 loadLocalMusic();
             }
-
         }
     }
 
@@ -368,31 +375,13 @@ public class MusicFragment extends Fragment {
         mIvPre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (currentPos > 0) {
-                    currentPos--;
-                    MusicInfo musicInfo = mMusicInfos.get(currentPos);
-                    currentMusicID = musicInfo.getId();
-                    mMusicInfoCurrent = musicInfo;
-                    Log.d(TAG, "onClick: " + currentMusicID + ":" + isPlaying);
-                    mTvMusicTitle.setText(musicInfo.getTitle());
-                    mMusicInfoAdapter.setSelectItem(currentPos);
-                    //放在这里无效 打断点之后了解的 原因不知道
-                    /*playMusic(musicInfo, 0); 函数里面也没有进行设置*/
-                    /*mIvPlay.setImageResource(R.drawable.widget_pause_selector);
-                    isPlaying = true;*/
-                    playMusic(musicInfo, MusicState.State.PLAYING);
-                    //需要放在这里面
-                    mIvPlay.setImageResource(R.drawable.widget_pause_selector);
-                    isPlaying = true;
-                } else {
-                    Toast.makeText(mContext, "没有上一曲了，请听其他的歌曲", Toast.LENGTH_SHORT).show();
-                }
+                playPreMuisc();
             }
         });
         mIvImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mIntent.putExtra("musicInfo", mMusicInfoCurrent);
+//                mIntent.putExtra("musicInfo", mMusicInfoCurrent);
                 mIntent.putExtra("isPlaying", isPlaying);
                 startActivity(mIntent);
             }
@@ -429,22 +418,48 @@ public class MusicFragment extends Fragment {
         mIvNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (currentPos < mMusicInfos.size() - 1) {
-                    currentPos++;
-                    MusicInfo musicInfo = mMusicInfos.get(currentPos);
-                    currentMusicID = musicInfo.getId();
-                    mTvMusicTitle.setText(musicInfo.getTitle());
-                    mMusicInfoAdapter.setSelectItem(currentPos);
-                    mMusicInfoCurrent = musicInfo;
-                    playMusic(musicInfo, MusicState.State.PLAYING);
-                    mIvPlay.setImageResource(R.drawable.widget_pause_selector);
-                    isPlaying = true;
-
-                } else {
-                    Toast.makeText(mContext, "没有下一曲了，请欣赏其他歌曲", Toast.LENGTH_SHORT).show();
-                }
+                playNextMusic();
             }
         });
+    }
+
+    private void playPreMuisc() {
+        if (currentPos > 0) {
+            currentPos--;
+            MusicInfo musicInfo = mMusicInfos.get(currentPos);
+            currentMusicID = musicInfo.getId();
+            mMusicInfoCurrent = musicInfo;
+            Log.d(TAG, "onClick: " + currentMusicID + ":" + isPlaying);
+            mTvMusicTitle.setText(musicInfo.getTitle());
+            mMusicInfoAdapter.setSelectItem(currentPos);
+            //放在这里无效 打断点之后了解的 原因不知道
+            /*playMusic(musicInfo, 0); 函数里面也没有进行设置*/
+            /*mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+            isPlaying = true;*/
+            playMusic(musicInfo, MusicState.State.PLAYING);
+            //需要放在这里面
+            mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+            isPlaying = true;
+        } else {
+            Toast.makeText(mContext, "没有上一曲了，请听其他的歌曲", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void playNextMusic() {
+        if (currentPos < mMusicInfos.size() - 1) {
+            currentPos++;
+            MusicInfo musicInfo = mMusicInfos.get(currentPos);
+            currentMusicID = musicInfo.getId();
+            mTvMusicTitle.setText(musicInfo.getTitle());
+            mMusicInfoAdapter.setSelectItem(currentPos);
+            mMusicInfoCurrent = musicInfo;
+            playMusic(musicInfo, MusicState.State.PLAYING);
+            mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+            isPlaying = true;
+
+        } else {
+            Toast.makeText(mContext, "没有下一曲了，请欣赏其他歌曲", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /*  private void playMusic(String path,int musicState) {
@@ -482,6 +497,7 @@ public class MusicFragment extends Fragment {
 
         DurationEvent.setDuration(duration);
         EventBus.getDefault().post(durationEvent);*/
+        mIntent.putExtra("musicInfo", musicInfo);
         mPbProgress.setMax(duration);
         Log.d(TAG, "playMusic: " + musicInfo.getDuration());
     }
@@ -527,11 +543,25 @@ public class MusicFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetPreMusic(PreMusicEvent preMusicEvent) {
+        playPreMuisc();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetPreMusic(NextMusicEvent nextMusicEvent) {
+        playNextMusic();
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMusicPositionEvent(MusicPositionEvent event) {
         MusicPositionEvent instance = MusicPositionEvent.getInstance();
         int currentPosition = instance.getCurrentPosition();
         Log.d(TAG, "onGetMusicPositionEvent: " + currentPosition);
         mPbProgress.setProgress(currentPosition);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetRandomMusic(RandomMusicEvent randomMusicEvent) {
+        playMusic(randomPlayMusic(), MusicState.State.PLAYING);
     }
     @Override
     public void onDestroyView() {
@@ -539,11 +569,18 @@ public class MusicFragment extends Fragment {
         super.onDestroyView();
     }
 
-    /*public MusicInfo randomPlayMusic() {
+    public MusicInfo randomPlayMusic() {
         Random random = new Random();
         int randomMusicPos = random.nextInt(mMusicInfos.size() - 1);
-        return mMusicInfos.get(randomMusicPos);
-    }*/
+        isPlaying = true;
+        mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+
+        mMusicInfoAdapter.setSelectItem(randomMusicPos);
+        MusicInfo musicInfo = mMusicInfos.get(randomMusicPos);
+        currentMusicID = musicInfo.getId();
+        return musicInfo;
+    }
+
 
    /* public interface OnFragmentInteractionListener {
 //        void onFragmentInteraction();

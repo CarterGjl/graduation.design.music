@@ -15,6 +15,7 @@ import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.PositionEvent;
+import com.carter.graduation.design.music.event.RandomMusicEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.player.MediaPlayerHolder;
 import com.carter.graduation.design.music.player.MusicState;
@@ -336,6 +337,7 @@ public class MusicPlayerService extends Service {
             MusicStateEvent stateEvent = MusicStateEvent.getInstance();
             stateEvent.setState(MusicState.State.COMPLETED);
             EventBus.getDefault().post(stateEvent);
+            EventBus.getDefault().post(new RandomMusicEvent());
             super.onPlaybackCompleted();
         }
 
