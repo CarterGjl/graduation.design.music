@@ -69,6 +69,7 @@ public class MusicFragment extends Fragment {
     private static final String TAG = "MusicFragment";
     //当前正在播放的音乐的位置  初始化为0
     private static int currentPos = 0;
+    private boolean isAppRunning = false;
     //    private static final int IS_PLAYING = 2;
     private int currentMusicID = -1;
     private boolean isPlaying = false;
@@ -104,6 +105,7 @@ public class MusicFragment extends Fragment {
                     MusicArrayListEvent instance = MusicArrayListEvent.getInstance();
                     instance.setMusicInfos(mMusicInfos);
                     EventBus.getDefault().post(instance);
+                    EventBus.getDefault().postSticky(instance);
                     mMusicInfoAdapter = new MusicInfoAdapter(mMusicInfos);
                     mRvSongListView.setAdapter(mMusicInfoAdapter);
                     if (mProgressDialog != null) {
@@ -188,13 +190,13 @@ public class MusicFragment extends Fragment {
      */
     private void initView(View view) {
         mRvSongListView = view.findViewById(R.id.rv_song_list);
-        mSplMusic = (SwipeRefreshLayout) view.findViewById(R.id.spl_refresh_music);
-        mIvImage = (ImageView) view.findViewById(R.id.widget_image);
-        mTvMusicTitle = (TextView) view.findViewById(R.id.widget_content);
-        mPbProgress = (ProgressBar) view.findViewById(R.id.widget_progress);
-        mIvPre = (ImageView) view.findViewById(R.id.widget_pre);
-        mIvPlay = (ImageView) view.findViewById(R.id.widget_play);
-        mIvNext = (ImageView) view.findViewById(R.id.widget_next);
+        mSplMusic = view.findViewById(R.id.spl_refresh_music);
+        mIvImage = view.findViewById(R.id.widget_image);
+        mTvMusicTitle = view.findViewById(R.id.widget_content);
+        mPbProgress = view.findViewById(R.id.widget_progress);
+        mIvPre = view.findViewById(R.id.widget_pre);
+        mIvPlay = view.findViewById(R.id.widget_play);
+        mIvNext = view.findViewById(R.id.widget_next);
         mIntent = new Intent(mContext, PlayDetailActivity.class);
     }
     /**
@@ -389,15 +391,21 @@ public class MusicFragment extends Fragment {
         mIvPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isPlaying) {
-                    Log.d(TAG, "onClick: " + "继续");
-                    playMusic(mMusicInfoCurrent, MusicState.State.CONTINUE_PLAYING);
+                if (!isAppRunning) {
+                    isAppRunning = true;
                     changeMusicState();
-                    Log.d(TAG, "onClick: " + isPlaying);
+                    playMusic(mMusicInfos.get(0), MusicState.State.PLAYING);
                 } else {
-                    Log.d(TAG, "onClick: " + "暂停");
-                    changeMusicState();
-                    playMusic(mMusicInfoCurrent, MusicState.State.PAUSED);
+                    if (!isPlaying) {
+                        Log.d(TAG, "onClick: " + "继续");
+                        playMusic(mMusicInfoCurrent, MusicState.State.CONTINUE_PLAYING);
+                        changeMusicState();
+                        Log.d(TAG, "onClick: " + isPlaying);
+                    } else {
+                        Log.d(TAG, "onClick: " + "暂停");
+                        changeMusicState();
+                        playMusic(mMusicInfoCurrent, MusicState.State.PAUSED);
+                    }
                 }
                 /*if (!isMusicFinished&&!isPlaying){
                     changeMusicState();
@@ -426,6 +434,7 @@ public class MusicFragment extends Fragment {
     private void playPreMuisc() {
         if (currentPos > 0) {
             currentPos--;
+            mCurrentPlayingPosition = currentPos;
             MusicInfo musicInfo = mMusicInfos.get(currentPos);
             currentMusicID = musicInfo.getId();
             mMusicInfoCurrent = musicInfo;
@@ -498,6 +507,7 @@ public class MusicFragment extends Fragment {
         DurationEvent.setDuration(duration);
         EventBus.getDefault().post(durationEvent);*/
         mIntent.putExtra("musicInfo", musicInfo);
+        mIntent.putExtra("currentPos", currentPos);
         mPbProgress.setMax(duration);
         Log.d(TAG, "playMusic: " + musicInfo.getDuration());
     }
@@ -660,6 +670,7 @@ public class MusicFragment extends Fragment {
                         mCurrentPlayingPosition = position;
                         currentMusicID = musicInfo.getId();
                         mMusicInfoCurrent = musicInfo;
+                        isAppRunning = true;
                         //更改音乐播放状态
                         changeMusicState();
                     } else if (isPlaying && currentMusicID != musicInfo.getId()) {
@@ -720,10 +731,10 @@ public class MusicFragment extends Fragment {
                 super(itemView);
 
                 cardView = (CardView) itemView;
-                tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
-                tvArtist = (TextView) itemView.findViewById(R.id.tv_artist);
-                ivMusic = (ImageView) itemView.findViewById(R.id.iv_music_album);
-                ivPlayState = (ImageView) itemView.findViewById(R.id.play_state);
+                tvTitle = itemView.findViewById(R.id.tv_title);
+                tvArtist = itemView.findViewById(R.id.tv_artist);
+                ivMusic = itemView.findViewById(R.id.iv_music_album);
+                ivPlayState = itemView.findViewById(R.id.play_state);
             }
         }
     }

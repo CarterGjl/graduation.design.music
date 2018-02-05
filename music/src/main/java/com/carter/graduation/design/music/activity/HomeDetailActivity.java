@@ -21,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,10 +46,8 @@ public class HomeDetailActivity extends BaseActivity
     private static final String TAG = "HomeDetailActivity";
     private ArrayList<ImageView> tabs = new ArrayList<>();
     private ImageView barnet, barmusic;
-    private ShareActionProvider mShareActionProvider;
     private ViewPager mMainViewPager;
     private long time = 0;
-    private MusicFragment mMusicFragment;
     //    private MusicPlayerService.MusicBinder mBinder;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -66,7 +65,7 @@ public class HomeDetailActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_detail);
-
+        Log.d(TAG, "onCreate: ");
         bindService();
         bindReceiver();
         initView();
@@ -74,13 +73,13 @@ public class HomeDetailActivity extends BaseActivity
     }
 
     private void initView() {
-        barnet = (ImageView) findViewById(R.id.bar_net);
-        barmusic = (ImageView) findViewById(R.id.bar_music);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        barnet = findViewById(R.id.bar_net);
+        barmusic = findViewById(R.id.bar_music);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,13 +88,13 @@ public class HomeDetailActivity extends BaseActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         setViewPager();
@@ -133,8 +132,8 @@ public class HomeDetailActivity extends BaseActivity
         MusicDynamicFragment musicDynamicFragment = new MusicDynamicFragment();
         MainViewPagerAdapter pagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(musicDynamicFragment);
-        mMusicFragment = new MusicFragment();
-        pagerAdapter.addFragment(mMusicFragment);
+        MusicFragment musicFragment = new MusicFragment();
+        pagerAdapter.addFragment(musicFragment);
 
 //        添加music页面 和  摇动界面
         mMainViewPager.setAdapter(pagerAdapter);
@@ -183,12 +182,12 @@ public class HomeDetailActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_detail, menu);
         MenuItem item = menu.findItem(R.id.action_share);
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, "abc");
         sendIntent.setType("text/plain");
-        mShareActionProvider.setShareIntent(sendIntent);
+        shareActionProvider.setShareIntent(sendIntent);
         return true;
     }
 
@@ -196,12 +195,8 @@ public class HomeDetailActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_share) {
+        return id == R.id.action_share || super.onOptionsItemSelected(item);
 
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -210,23 +205,29 @@ public class HomeDetailActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_about_app) {
-            Intent intent = new Intent(this, AboutAppActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
+        switch (id) {
+            case R.id.nav_about_app:
+                Intent intent = new Intent(this, AboutAppActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.nav_gallery:
 
-        } else if (id == R.id.nav_slideshow) {
-            TimingFragment timingFragment = new TimingFragment();
-            timingFragment.show(getFragmentManager(), "timing");
-        } else if (id == R.id.nav_exit) {
-            finish();
-        }/* else if (id == R.id.nav_share) {
+                break;
+            case R.id.nav_slideshow:
+                TimingFragment timingFragment = new TimingFragment();
+                timingFragment.show(getFragmentManager(), "timing");
+                break;
+            case R.id.nav_exit:
+                finish();
+                break;
+        }
+
+        /* else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
         }*/
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

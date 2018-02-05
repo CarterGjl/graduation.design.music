@@ -12,6 +12,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.carter.graduation.design.music.R;
+import com.carter.graduation.design.music.event.MusicArrayListEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
@@ -23,6 +24,8 @@ import com.carter.graduation.design.music.utils.MusicUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
 
 public class PlayDetailActivity extends BaseActivity implements View.OnClickListener {
 
@@ -38,6 +41,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
 
     private boolean mUserIsSeeking = false;
     private boolean mIsPlaying;
+    private ArrayList<MusicInfo> mMusicInfos;
+    private int mCurrentPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
 
     private void getSomething() {
         Intent intent = getIntent();
-        MusicInfo musicInfo = (MusicInfo) intent.getParcelableExtra("musicInfo");
+        mCurrentPos = intent.getIntExtra("currentPos", 0);
+        MusicInfo musicInfo = intent.getParcelableExtra("musicInfo");
         int duration = musicInfo.getDuration();
         Log.d(TAG, "onStart: " + duration);
         mTvTotalTime.setText(MusicUtils.formatTime(duration));
@@ -75,27 +81,25 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolBar);
+        Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
-        mTvTitle = (TextView) findViewById(R.id.tv_title);
-        mTvArtist = (TextView) findViewById(R.id.tv_artist);
-        mTvCurrentTime = (TextView) findViewById(R.id.tvCurrentTime);
-        mTvTotalTime = (TextView) findViewById(R.id.tvTotalTime);
-        ImageView ivPre = (ImageView) findViewById(R.id.iv_pre);
-        mIvPlayOrPause = (ImageView) findViewById(R.id.iv_play_or_pause);
-        ImageView ivNext = (ImageView) findViewById(R.id.iv_next);
-        mSbMusic = (SeekBar) findViewById(R.id.musicSeekBar);
+        mTvTitle = findViewById(R.id.tv_title);
+        mTvArtist = findViewById(R.id.tv_artist);
+        mTvCurrentTime = findViewById(R.id.tvCurrentTime);
+        mTvTotalTime = findViewById(R.id.tvTotalTime);
+        ImageView ivPre = findViewById(R.id.iv_pre);
+        mIvPlayOrPause = findViewById(R.id.iv_play_or_pause);
+        ImageView ivNext = findViewById(R.id.iv_next);
+        mSbMusic = findViewById(R.id.musicSeekBar);
 
         ivPre.setOnClickListener(this);
         mIvPlayOrPause.setOnClickListener(this);
         ivNext.setOnClickListener(this);
         mSbMusic.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int userSelectedPosition = 0;
-
-
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
@@ -119,15 +123,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
                 Log.d(TAG, "onStopTrackingTouch: " + userSelectedPosition);
                 sendBroadcast(intent);
             }
-
-          /*  private void seekTo() {
-                SeekBarEvent instance = SeekBarEvent.getInstance();
-                instance.setUserSelectedPosition(userSelectedPosition);
-                EventBus.getDefault().post(instance);
-            }*/
         });
     }
-
 
     @Override
     public void onClick(View view) {
@@ -136,6 +133,10 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
                 //上一曲
                 PreMusicEvent instance = PreMusicEvent.getInstance();
                 instance.setPre(0);
+                if (mCurrentPos > 0) {
+                    mCurrentPos--;
+                    switchMusic();
+                }
                 EventBus.getDefault().post(instance);
                 break;
             case R.id.iv_play_or_pause:
@@ -144,10 +145,21 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.iv_next:
                 //下一曲
                 EventBus.getDefault().post(new NextMusicEvent());
+                if (mCurrentPos < mMusicInfos.size() - 1) {
+                    mCurrentPos++;
+                    switchMusic();
+                }
                 break;
             default:
                 break;
         }
+    }
+
+    private void switchMusic() {
+        MusicInfo musicInfo = mMusicInfos.get(mCurrentPos);
+        mTvTotalTime.setText(MusicUtils.formatTime(musicInfo.getDuration()));
+        mTvTitle.setText(musicInfo.getTitle());
+        mTvArtist.setText(musicInfo.getAlbum());
     }
 
     @Override
@@ -162,6 +174,17 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         return super.onOptionsItemSelected(item);
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onGetMusicArrayListEvent(MusicArrayListEvent musicArrayListEvent) {
+        mMusicInfos = musicArrayListEvent.getMusicInfos();
+//        MusicArrayListEvent stickyEvent = EventBus.getDefault().getStickyEvent(MusicArrayListEvent.class);
+        //清除事件避免多次运行
+       /* if (stickyEvent != null) {
+            EventBus.getDefault().removeStickyEvent(stickyEvent);
+        }*/
+
+        Log.d(TAG, "onGetMusicArrayListEvent: ");
+    }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMusicFinished(MusicStateEvent stateEvent) {
         int state = stateEvent.getState();
@@ -201,6 +224,4 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
-
-
 }
