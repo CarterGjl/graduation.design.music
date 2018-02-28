@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.carter.graduation.design.music.event.MusicArrayListEvent;
+import com.carter.graduation.design.music.event.MusicStartEvent;
+import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.utils.UiUtil;
 import com.carter.graduation.design.music.widget.ShakeListener;
@@ -167,10 +169,12 @@ public class MusicDynamicFragment extends Fragment {
             int g = random.nextInt(200) + 30;
             int b = random.nextInt(200) + 30;
             view.setTextColor(Color.rgb(r, g, b));
+            final int finalPosition = position;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(UiUtil.getContext(), musicInfo.getTitle(), Toast.LENGTH_SHORT).show();
+                    playMusic(finalPosition);
                 }
             });
             return view;
@@ -195,5 +199,11 @@ public class MusicDynamicFragment extends Fragment {
             }
             return group;
         }
+    }
+
+    private void playMusic(int finalPosition) {
+        MusicStartEvent instance = MusicStartEvent.getInstance();
+        instance.setPosition(finalPosition);
+        EventBus.getDefault().post(instance);
     }
 }

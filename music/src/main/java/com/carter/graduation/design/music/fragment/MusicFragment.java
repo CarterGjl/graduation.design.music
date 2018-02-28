@@ -38,6 +38,7 @@ import com.carter.graduation.design.music.event.HeadsetEvent;
 import com.carter.graduation.design.music.event.MusicArrayListEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
+import com.carter.graduation.design.music.event.MusicStartEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
@@ -377,7 +378,7 @@ public class MusicFragment extends Fragment {
         mIvPre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playPreMuisc();
+                playPreMusic();
             }
         });
         mIvImage.setOnClickListener(new View.OnClickListener() {
@@ -431,7 +432,7 @@ public class MusicFragment extends Fragment {
         });
     }
 
-    private void playPreMuisc() {
+    private void playPreMusic() {
         if (currentPos > 0) {
             currentPos--;
             mCurrentPlayingPosition = currentPos;
@@ -554,9 +555,15 @@ public class MusicFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetPreMusic(PreMusicEvent preMusicEvent) {
-        playPreMuisc();
+        playPreMusic();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetMusicPosition(MusicStartEvent musicStartEvent){
+        changeMusicState();
+        int position = musicStartEvent.getPosition();
+        playMusic(mMusicInfos.get(position),MusicState.State.PLAYING);
+    }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetPreMusic(NextMusicEvent nextMusicEvent) {
         playNextMusic();
