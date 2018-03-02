@@ -56,11 +56,11 @@ public class MusicPlayerService extends Service {
          }
      };*/
     //当前播放歌曲
-    private static int currentPos;
+//    private static int currentPos;
     private boolean isRandom = false;
     private boolean isMusicChanged = false;
     private boolean isMusicFinished = false;
-    private Timer mTimer = new Timer();
+//    private Timer mTimer = new Timer();
     /**
      * 用于获取当前的播放的位置
      */
@@ -176,13 +176,22 @@ public class MusicPlayerService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
+        initNotification();
+//        mTimer.schedule(mTimerTask,0,1000);
+        return null;
+    }
+
+    /**
+     * 显示应用正在运行的图标
+     */
+    private void initNotification() {
         Notification notification;
 //        mNm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Intent musicIntent = new Intent(this, HomeDetailActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, musicIntent, 0);
 
         notification = new Notification.Builder(this)
-                .setContentTitle("music running")
+                .setContentTitle("糕糕 running")
                 .setContentText("别摸我 摸我咬你 (￢_￢)智商三岁")
                 .setWhen(System.currentTimeMillis())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon))
@@ -192,8 +201,6 @@ public class MusicPlayerService extends Service {
                 .build();
 
         startForeground(NOTIFICATION, notification);
-//        mTimer.schedule(mTimerTask,0,1000);
-        return null;
     }
 
 
