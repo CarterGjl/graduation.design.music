@@ -112,6 +112,13 @@ public class MusicFragment extends Fragment {
                     if (mProgressDialog != null) {
                         mProgressDialog.dismiss();
                     }
+                    //默认显示播放第一首歌
+                    mTvMusicTitle.setText(mMusicInfos.get(0).getTitle());
+                    mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, mMusicInfos.get(0).getId(),
+                            mMusicInfos.get(0).getAlbum_id(), true, true));
+                    if (mPbProgress != null) {
+                        mPbProgress.setProgress(0);
+                    }
                     mSplMusic.setRefreshing(false);
                    /* MusicInfo musicInfo = mMusicInfos.get(0);
                     playMusic(musicInfo,MusicState.State.PLAYING);
@@ -130,7 +137,7 @@ public class MusicFragment extends Fragment {
 
         }
     };
-    //当前播放音乐的路径
+    //保存当前播放音乐
     private MusicInfo mMusicInfoCurrent;
     //    private int mPauseProgress;
     private int mCurrentPlayingPosition;
@@ -393,8 +400,11 @@ public class MusicFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (!isAppRunning) {
+                    //isAppRunning  开启后是否播放了音乐
                     isAppRunning = true;
                     changeMusicState();
+
+                    mMusicInfoCurrent = mMusicInfos.get(0);
                     playMusic(mMusicInfos.get(0), MusicState.State.PLAYING);
                 } else {
                     if (!isPlaying) {
@@ -560,9 +570,14 @@ public class MusicFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMusicPosition(MusicStartEvent musicStartEvent){
-        changeMusicState();
+        if (!isPlaying) {
+            changeMusicState();
+        }
+        isAppRunning = true;
         int position = musicStartEvent.getPosition();
-        playMusic(mMusicInfos.get(position),MusicState.State.PLAYING);
+        mMusicInfoCurrent = mMusicInfos.get(position);
+        mMusicInfoAdapter.setSelectItem(position);
+        playMusic(mMusicInfoCurrent,MusicState.State.PLAYING);
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetPreMusic(NextMusicEvent nextMusicEvent) {

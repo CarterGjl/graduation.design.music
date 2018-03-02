@@ -31,7 +31,7 @@ public class SplashActivity extends Activity {
                 goHome();
             }
         },SPLASH_DELAY_MILLS);*/
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 22) {
             View decorView = getWindow().getDecorView();
             int option = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(option);
