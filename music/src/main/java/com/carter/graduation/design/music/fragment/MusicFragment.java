@@ -517,6 +517,7 @@ public class MusicFragment extends Fragment {
 
         DurationEvent.setDuration(duration);
         EventBus.getDefault().post(durationEvent);*/
+
         mIntent.putExtra("musicInfo", musicInfo);
         mIntent.putExtra("currentPos", currentPos);
         mPbProgress.setMax(duration);

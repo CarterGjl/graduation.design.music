@@ -62,6 +62,9 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         Intent intent = getIntent();
         mCurrentPos = intent.getIntExtra("currentPos", 0);
         MusicInfo musicInfo = intent.getParcelableExtra("musicInfo");
+        if (musicInfo == null) {
+            musicInfo = mMusicInfos.get(0);
+        }
         int duration = musicInfo.getDuration();
         Log.d(TAG, "onStart: " + duration);
         mTvTotalTime.setText(MusicUtils.formatTime(duration));
