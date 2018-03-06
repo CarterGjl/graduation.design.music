@@ -93,8 +93,10 @@ public class MusicDynamicFragment extends Fragment {
     public void onGetMusicArrayListEvent(MusicArrayListEvent musicArrayListEvent) {
         if (musicArrayListEvent != null) {
             ArrayList<MusicInfo> musicInfos = musicArrayListEvent.getMusicInfos();
-            mStellarMap.setAdapter(new RecommendAdapter(musicInfos));
-            mStellarMap.setGroup(0, true);
+            if (musicInfos != null) {
+                mStellarMap.setAdapter(new RecommendAdapter(musicInfos));
+                mStellarMap.setGroup(0, true);
+            }
         }
     }
 
