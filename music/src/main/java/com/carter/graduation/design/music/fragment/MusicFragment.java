@@ -511,6 +511,7 @@ public class MusicFragment extends Fragment {
     @SuppressLint("NewApi")
     private void playMusic(MusicInfo musicInfo, @MusicState.State int musicState) {
         currentMusicID = musicInfo.getId();
+        mMusicInfoCurrent = musicInfo;
         mTvMusicTitle.setText(musicInfo.getTitle());
         mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
                 musicInfo.getAlbum_id(), true, true));
@@ -521,11 +522,6 @@ public class MusicFragment extends Fragment {
         instance.setMusicState(musicState);
         EventBus.getDefault().post(instance);
         int duration = musicInfo.getDuration();
-        /*DurationEvent durationEvent = DurationEvent.getInstance();
-
-        DurationEvent.setDuration(duration);
-        EventBus.getDefault().post(durationEvent);*/
-
         mIntent.putExtra("musicInfo", musicInfo);
         mIntent.putExtra("currentPos", currentPos);
         mPbProgress.setMax(duration);
@@ -698,12 +694,7 @@ public class MusicFragment extends Fragment {
                     } else if (!isPlaying) {
                         Toast.makeText(UiUtil.getContext(), "正在播放" + mMusicInfos.get(position).getTitle(), Toast
                                 .LENGTH_SHORT).show();
-                       /* mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
-                                musicInfo.getAlbum_id(), true, true));
-                        mTvMusicTitle.setText(musicInfo.getTitle());*/
                         Log.d(TAG, "onClick: " + musicInfo.getUrl());
-                        //playMusic(musicInfo.getUrl());
-                        //playMusic(musicInfo);
                         playMusic(musicInfo, MusicState.State.PLAYING);
                         //更改状态  当前正在播放的位置 记录
                         mCurrentPlayingPosition = position;

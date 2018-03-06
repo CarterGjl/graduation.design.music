@@ -22,8 +22,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
-                android:gravity="center">
+                android:layout_height="?actionBarSize">
 
                 <ImageView
                     android:id="@+id/bar_net"
@@ -44,14 +43,17 @@
                     android:clickable="true"
                     android:focusable="true"
                     tools:ignore="ContentDescription" />
+
                 <ImageView
                     android:id="@+id/bar_search"
                     android:layout_width="23dp"
                     android:layout_height="23dp"
-                    android:scaleType="center"
-                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:background="@drawable/actionbar_search" />
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/bar_music"
+                    android:background="@drawable/actionbar_search"
+                    android:scaleType="center"
+                    tools:ignore="ContentDescription" />
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
 

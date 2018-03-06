@@ -65,11 +65,9 @@ public class HomeDetailActivity extends BaseActivity
     private ImageView barnet, barmusic;
     private ViewPager mMainViewPager;
     private long time = 0;
-    //    private MusicPlayerService.MusicBinder mBinder;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-//            mBinder = (MusicPlayerService.MusicBinder) iBinder;
         }
 
         @Override
@@ -78,7 +76,6 @@ public class HomeDetailActivity extends BaseActivity
         }
     };
     private Context mContext;
-    //private ArrayList<MusicInfo> mMusicInfos1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,26 +215,11 @@ public class HomeDetailActivity extends BaseActivity
         shareActionProvider.setShareIntent(sendIntent);
         return true;
     }
-
-    private ArrayList<MusicInfo> queryMusic(String newText) {
-        HashSet<MusicInfo> musicInfos = MusicUtils.queryMusic(mContext, newText);
-        // TODO: 2018/3/5
-        ArrayList<MusicInfo> musicInfos1 = new ArrayList<>();
-        musicInfos1 = new ArrayList<>();
-        for (MusicInfo musicInfo : musicInfos) {
-            musicInfos1.add((musicInfo));
-            String title = musicInfos1.get(0).getTitle();
-            Log.d(TAG, "queryMusic: "+title);
-        }
-        return musicInfos1;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        
         int id = item.getItemId();
-
         return id == R.id.action_share || super.onOptionsItemSelected(item);
-
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -302,7 +284,6 @@ public class HomeDetailActivity extends BaseActivity
 
     @Override
     public void onFragmentInteraction() {
-//        mMusicFragment = MusicFragment.newInstance(mMusicInfos, "音乐");
     }
 
     @Override
@@ -326,7 +307,6 @@ public class HomeDetailActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        //setNotification();
     }
 
 
