@@ -12,6 +12,8 @@
     <string name="pre_music">上一曲</string>
     <string name="theme">theme</string>
     <string name="music_image">music_image</string>
+    <string name="search_local_music">搜索本地音乐</string>
+    <string name="search">搜索歌曲</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

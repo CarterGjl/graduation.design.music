@@ -14,11 +14,13 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ActionProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,14 +32,29 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
+import com.carter.graduation.design.music.event.MusicArrayListEvent;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
+import com.carter.graduation.design.music.fragment.SearchMusicFragment;
 import com.carter.graduation.design.music.fragment.TimingFragment;
+import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.receiver.HeadsetReceiver;
 import com.carter.graduation.design.music.service.MusicPlayerService;
+import com.carter.graduation.design.music.utils.MusicUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class HomeDetailActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -60,11 +77,14 @@ public class HomeDetailActivity extends BaseActivity
 
         }
     };
+    private Context mContext;
+    //private ArrayList<MusicInfo> mMusicInfos1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_detail);
+        mContext = this;
         Log.d(TAG, "onCreate: ");
         bindService();
         bindReceiver();
@@ -75,8 +95,16 @@ public class HomeDetailActivity extends BaseActivity
     private void initView() {
         barnet = findViewById(R.id.bar_net);
         barmusic = findViewById(R.id.bar_music);
+        ImageView ivSearch = findViewById(R.id.bar_search);
+        ivSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, LocalSearchActivity.class);
+                startActivity(intent);
+            }
+        });
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("");
+        toolbar.setTitle("我的音乐");
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -189,6 +217,19 @@ public class HomeDetailActivity extends BaseActivity
         sendIntent.setType("text/plain");
         shareActionProvider.setShareIntent(sendIntent);
         return true;
+    }
+
+    private ArrayList<MusicInfo> queryMusic(String newText) {
+        HashSet<MusicInfo> musicInfos = MusicUtils.queryMusic(mContext, newText);
+        // TODO: 2018/3/5
+        ArrayList<MusicInfo> musicInfos1 = new ArrayList<>();
+        musicInfos1 = new ArrayList<>();
+        for (MusicInfo musicInfo : musicInfos) {
+            musicInfos1.add((musicInfo));
+            String title = musicInfos1.get(0).getTitle();
+            Log.d(TAG, "queryMusic: "+title);
+        }
+        return musicInfos1;
     }
 
     @Override

@@ -6,4 +6,6 @@
     <color name="colorPrimaryDark">#FF4081</color>
     <color name="colorAccent">#FF4081</color>
     <color name="text_color">#FF000000</color>
+    <color name="normalBackground">#fff2f4f5</color>
+    <color name="theme_color_primary">#d20000</color>
 </resources>

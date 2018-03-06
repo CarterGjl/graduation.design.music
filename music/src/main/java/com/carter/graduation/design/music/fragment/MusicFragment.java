@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -24,6 +25,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -349,7 +352,7 @@ public class MusicFragment extends Fragment {
         startActivity(localIntent);
     }
 
-    private void showShare(String info) {
+    private void showShare(String info,String url) {
         // TODO: 2018/1/26 需要完成歌曲的分享 、
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
@@ -361,6 +364,10 @@ public class MusicFragment extends Fragment {
         //oks.setTitleUrl("http://www.baidu.com");
         // text是分享文本，所有平台都需要这个字段
         oks.setText(info);
+        oks.setSite(getString(R.string.app_name));
+        oks.setFilePath(Environment.getExternalStorageDirectory()+url);
+        Log.d(TAG, "showShare: "+Environment.getExternalStorageDirectory());
+        Log.d(TAG, "showShare: "+Environment.getExternalStorageDirectory()+url);
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         //oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
         // url在微信、微博，Facebook等平台中使用
@@ -596,6 +603,13 @@ public class MusicFragment extends Fragment {
     public void onGetRandomMusic(RandomMusicEvent randomMusicEvent) {
         playMusic(randomPlayMusic(), MusicState.State.PLAYING);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
     @Override
     public void onDestroyView() {
         EventBus.getDefault().unregister(this);
@@ -732,7 +746,7 @@ public class MusicFragment extends Fragment {
             holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    showShare(musicInfo.getTitle());
+                    showShare(musicInfo.getTitle(),musicInfo.getUrl());
                     return true;
                 }
             });

@@ -14,11 +14,13 @@ import android.provider.MediaStore;
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.info.MusicInfo;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by newthinkpad on 2018/1/19.
@@ -270,5 +272,51 @@ public class MusicUtils {
             }
         }
         return candidate;
+    }
+    public static HashSet<MusicInfo> queryMusic(Context context,String key){
+        HashSet<MusicInfo> musicList = new HashSet<>();
+        Cursor cursor = null;
+        cursor= context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,
+                MediaStore.Audio.Media.DISPLAY_NAME + " LIKE '%" + key + "%'",null,MediaStore.Audio
+                        .Media.DEFAULT_SORT_ORDER);
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        ._ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .ALBUM));
+                int albumId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .ALBUM_ID));
+                String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .ARTIST));
+                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .DATA));
+                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .DURATION));
+                long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
+                        .SIZE));
+
+                if (size > 1024 * 80) {
+                    //大于80k
+                    MusicInfo musicInfo = new MusicInfo();
+                    musicInfo.setId(id);
+                    musicInfo.setAlbum(album);
+                    musicInfo.setDuration(duration);
+                    musicInfo.setSize(size);
+                    musicInfo.setTitle(title);
+                    musicInfo.setUrl(url);
+                    musicInfo.setAlbum_id(albumId);
+                    musicList.add(musicInfo);
+                }
+                cursor.moveToNext();
+            }
+        }
+        return musicList;
+    }
+    public static boolean isExists(String path) {
+        File file = new File(path);
+        return file.exists();
     }
 }

@@ -61,6 +61,10 @@
         </receiver>
 
         <activity android:name=".activity.BaseActivity" />
+        <activity android:name=".activity.LocalSearchActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
     </application>
 
 </manifest>
