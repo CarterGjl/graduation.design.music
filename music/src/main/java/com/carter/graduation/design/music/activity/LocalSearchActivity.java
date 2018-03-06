@@ -34,8 +34,8 @@ public class LocalSearchActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("我的音乐");
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("查找音乐");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         RecyclerView re = findViewById(R.id.recyclerview);

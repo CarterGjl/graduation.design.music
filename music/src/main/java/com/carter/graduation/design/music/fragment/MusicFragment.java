@@ -510,6 +510,7 @@ public class MusicFragment extends Fragment {
      */
     @SuppressLint("NewApi")
     private void playMusic(MusicInfo musicInfo, @MusicState.State int musicState) {
+        currentMusicID = musicInfo.getId();
         mTvMusicTitle.setText(musicInfo.getTitle());
         mIvImage.setImageBitmap(MusicUtils.getArtwork(mContext, musicInfo.getId(),
                 musicInfo.getAlbum_id(), true, true));
@@ -684,6 +685,7 @@ public class MusicFragment extends Fragment {
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     currentPos = position;
                     setSelectItem(position);
                     int id = musicInfo.getId();
@@ -705,7 +707,7 @@ public class MusicFragment extends Fragment {
                         playMusic(musicInfo, MusicState.State.PLAYING);
                         //更改状态  当前正在播放的位置 记录
                         mCurrentPlayingPosition = position;
-                        currentMusicID = musicInfo.getId();
+
                         mMusicInfoCurrent = musicInfo;
                         isAppRunning = true;
                         //更改音乐播放状态

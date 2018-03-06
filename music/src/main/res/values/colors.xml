@@ -2,8 +2,8 @@
 <resources>
     <color name="widget_background_color">#a0000000</color>
     <color name="white_text">#fafafa</color>
-    <color name="colorPrimary">#FF4081</color>
-    <color name="colorPrimaryDark">#FF4081</color>
+    <color name="colorPrimary">#6ad0df</color>
+    <color name="colorPrimaryDark">#6ad0df</color>
     <color name="colorAccent">#FF4081</color>
     <color name="text_color">#FF000000</color>
     <color name="normalBackground">#fff2f4f5</color>
