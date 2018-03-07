@@ -17,6 +17,7 @@ import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
 import com.carter.graduation.design.music.event.PlayOrPauseEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
+import com.carter.graduation.design.music.event.RandomMusicEven;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.player.MusicState;
@@ -69,12 +70,9 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         }
         int duration = musicInfo.getDuration();
         Log.d(TAG, "onStart: " + duration);
-        mTvTotalTime.setText(MusicUtils.formatTime(duration));
-        mTvCurrentTime.setText(MusicUtils.formatTime(currentPlayingPos));
-        mTvArtist.setText(musicInfo.getAlbum());
+        setMusic(musicInfo, duration);
         Log.d(TAG, "onStart: " + musicInfo.getTitle());
         Log.d(TAG, "onStart: " + musicInfo.getAlbum());
-        mTvTitle.setText(musicInfo.getTitle());
         mSbMusic.setMax(duration);
         mSbMusic.setProgress(currentPlayingPos);
         mIsPlaying = intent.getBooleanExtra("isPlaying", false);
@@ -86,6 +84,22 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    private void setMusic(MusicInfo musicInfo, int duration) {
+        mTvTotalTime.setText(MusicUtils.formatTime(duration));
+        mTvCurrentTime.setText(MusicUtils.formatTime(currentPlayingPos));
+        mTvTitle.setText(musicInfo.getTitle());
+        mTvArtist.setText(musicInfo.getAlbum());
+        mSbMusic.setMax(duration);
+        mSbMusic.setProgress(0);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getRandomMusicEvent(RandomMusicEven randomMusicEven){
+        MusicInfo musicInfo = randomMusicEven.getMusicInfo();
+        Log.d(TAG, "getRandomMusicEvent: ");
+        setMusic(musicInfo,musicInfo.getDuration());
+
+    }
     private void initView() {
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
@@ -110,7 +124,6 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     userSelectedPosition = progress;
-                    //seekTo();
                     Log.d(TAG, "onProgressChanged: " + userSelectedPosition);
                 }
             }

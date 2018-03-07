@@ -49,7 +49,7 @@ public class LocalSearchActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.menu_search);
         SearchView searchView = ((SearchView) searchItem.getActionView());
-        searchView.setIconified(true);
+        searchView.setIconified(false);
         searchView.setIconifiedByDefault(true);
         searchView.setQueryHint("输入歌曲名字查找");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -70,9 +70,6 @@ public class LocalSearchActivity extends AppCompatActivity {
                     Log.d(TAG, "onQueryTextChange: "+musicInfos.get(i).getTitle());
                 }
                 mSearchAdapter.updateSearchResults(musicInfos);
-       /* Log.d(TAG, "onQueryTextChange: "+searchResults.get(0).getTitle());
-       *//*
-                mSearchAdapter.updateSearchResults(searchResults);*/
                 mSearchAdapter.notifyDataSetChanged();
                 return true;
             }

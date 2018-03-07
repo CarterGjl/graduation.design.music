@@ -46,6 +46,7 @@ import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
 import com.carter.graduation.design.music.event.PlayOrPauseEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
+import com.carter.graduation.design.music.event.RandomMusicEven;
 import com.carter.graduation.design.music.event.RandomMusicEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
@@ -311,8 +312,6 @@ public class MusicFragment extends Fragment {
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                /*Toast.makeText(mContext, "本app需要此权限否则无法使用,请前往系统设置开启",
-                        Toast.LENGTH_SHORT).show();*/
                 Snackbar.make(mRvSongListView, "本app需要此权限否则无法使用,请前往系统设置开启", Snackbar.LENGTH_LONG)
                         .setAction("允许使用权限", new View.OnClickListener() {
                             @Override
@@ -320,8 +319,6 @@ public class MusicFragment extends Fragment {
                                 goToSetting();
                             }
                         }).show();
-
-
             }
         });
         builder.show();
@@ -421,20 +418,6 @@ public class MusicFragment extends Fragment {
                         playMusic(mMusicInfoCurrent, MusicState.State.PAUSED);
                     }
                 }
-                /*if (!isMusicFinished&&!isPlaying){
-                    changeMusicState();
-                    Log.d(TAG, "onClick: "+"继续");
-                    playMusic(mMusicInfoCurrent,2);
-                }else if (isPlaying){
-                    changeMusicState();
-                    Log.d(TAG, "onClick: "+"暂停");
-                    playMusic(mMusicInfoCurrent,1);
-                }else if (isMusicFinished&& !isPlaying){
-                    isMusicFinished = false;
-                    changeMusicState();
-                    Log.d(TAG, "onClick: "+"重新开始");
-                    playMusic(mMusicInfoCurrent,2);
-                }*/
             }
         });
         mIvNext.setOnClickListener(new View.OnClickListener() {
@@ -607,7 +590,11 @@ public class MusicFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetRandomMusic(RandomMusicEvent randomMusicEvent) {
-        playMusic(randomPlayMusic(), MusicState.State.PLAYING);
+        MusicInfo randomPlayMusic = randomPlayMusic();
+        playMusic(randomPlayMusic, MusicState.State.PLAYING);
+        RandomMusicEven instance = RandomMusicEven.getInstance();
+        instance.setMusicInfo(randomPlayMusic);
+        EventBus.getDefault().post(instance);
     }
 
     @Override
