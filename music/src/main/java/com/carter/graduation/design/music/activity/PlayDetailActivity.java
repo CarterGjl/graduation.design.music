@@ -15,6 +15,7 @@ import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.event.MusicArrayListEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
+import com.carter.graduation.design.music.event.PlayOrPauseEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
 import com.carter.graduation.design.music.info.MusicInfo;
@@ -43,6 +44,7 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
     private boolean mIsPlaying;
     private ArrayList<MusicInfo> mMusicInfos;
     private int mCurrentPos;
+    private boolean mIsAppRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
         mSbMusic.setMax(duration);
         mSbMusic.setProgress(currentPlayingPos);
         mIsPlaying = intent.getBooleanExtra("isPlaying", false);
+        mIsAppRunning = intent.getBooleanExtra("isAppRunning", false);
         if (mIsPlaying) {
             mIvPlayOrPause.setImageResource(R.drawable.widget_pause_selector);
         } else {
@@ -144,6 +147,18 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.iv_play_or_pause:
                 //播放
+                if (mIsPlaying) {
+                    mIvPlayOrPause.setImageResource(R.drawable.widget_play_selector);
+                    mIsPlaying = false;
+                }else {
+                    mIsPlaying = true;
+                    mIvPlayOrPause.setImageResource(R.drawable.widget_pause_selector);
+                }
+                PlayOrPauseEvent instance1 = PlayOrPauseEvent.getInstance();
+
+                instance1.setAppRunning(mIsAppRunning);
+                instance1.setPlaying(mIsPlaying);
+                EventBus.getDefault().post(instance1);
                 break;
             case R.id.iv_next:
                 //下一曲

@@ -44,6 +44,7 @@ import com.carter.graduation.design.music.event.MusicPositionEvent;
 import com.carter.graduation.design.music.event.MusicStartEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
+import com.carter.graduation.design.music.event.PlayOrPauseEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
 import com.carter.graduation.design.music.event.RandomMusicEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
@@ -126,6 +127,7 @@ public class MusicFragment extends Fragment {
                    /* MusicInfo musicInfo = mMusicInfos.get(0);
                     playMusic(musicInfo,MusicState.State.PLAYING);
                     mTvMusicTitle.setText(musicInfo.getTitle());*/
+                   mMusicInfoCurrent = mMusicInfos.get(0);
                     break;
 //                    最初的进度进度条逻辑
                 /*case IS_PLAYING:
@@ -253,14 +255,6 @@ public class MusicFragment extends Fragment {
             }
         }).start();
     }
-
-
-
- /*   public void onButtonPressed() {
-        if (mListener != null) {
-            mListener.onFragmentInteraction();
-        }
-    }*/
 
     @Override
     public void onAttach(Context context) {
@@ -400,6 +394,8 @@ public class MusicFragment extends Fragment {
             public void onClick(View view) {
 //                mIntent.putExtra("musicInfo", mMusicInfoCurrent);
                 mIntent.putExtra("isPlaying", isPlaying);
+                mIntent.putExtra("isAppRunning",isAppRunning);
+                mIntent.putExtra("isPlaying",isPlaying);
                 startActivity(mIntent);
             }
         });
@@ -524,6 +520,8 @@ public class MusicFragment extends Fragment {
         int duration = musicInfo.getDuration();
         mIntent.putExtra("musicInfo", musicInfo);
         mIntent.putExtra("currentPos", currentPos);
+        mIntent.putExtra("isAppRunning",isAppRunning);
+        mIntent.putExtra("isPlaying",isPlaying);
         mPbProgress.setMax(duration);
         Log.d(TAG, "playMusic: " + musicInfo.getDuration());
     }
@@ -549,6 +547,17 @@ public class MusicFragment extends Fragment {
         changeMusicState();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetPlayOrPause(PlayOrPauseEvent playOrPauseEvent){
+        isAppRunning = !playOrPauseEvent.isAppRunning();
+        isPlaying = playOrPauseEvent.isPlaying();
+        if (isPlaying) {
+            playMusic(mMusicInfoCurrent,MusicState.State.PLAYING);
+        }else {
+            playMusic(mMusicInfoCurrent,MusicState.State.PAUSED);
+        }
+
+    }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMusicFinishedEvent(MusicStateEvent stateEvent) {
         int state = stateEvent.getState();
