@@ -14,6 +14,7 @@ import com.carter.graduation.design.music.event.DurationEvent;
 import com.carter.graduation.design.music.event.MusicEvent;
 import com.carter.graduation.design.music.event.MusicPositionEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
+import com.carter.graduation.design.music.event.PlayingWayEvent;
 import com.carter.graduation.design.music.event.PositionEvent;
 import com.carter.graduation.design.music.event.RandomMusicEvent;
 import com.carter.graduation.design.music.event.SeekBarEvent;
@@ -31,6 +32,7 @@ import java.util.Timer;
 
 public class MusicPlayerService extends Service {
 
+    private boolean playingRandomMusic;
     private static final String TAG = "MusicPlayerService";
     //通知id
     private static final int NOTIFICATION = 1;
@@ -261,6 +263,10 @@ public class MusicPlayerService extends Service {
 //        new Thread(this).start();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getPlayingWayEvent(PlayingWayEvent playingWayEvent){
+        playingRandomMusic = playingWayEvent.isRandom();
+    }
     //有点意思  事件的重复导致的之前的问题吗？？？？？？？？？？、、、、、
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetSeekPos(PositionEvent positionEvent) {
@@ -318,11 +324,13 @@ public class MusicPlayerService extends Service {
                 default:
                     break;
                 case State.COMPLETED:
+                    MusicStateEvent musicStateEvent = MusicStateEvent.getInstance();
+                    musicStateEvent.setState(MusicState.State.COMPLETED);
+                    EventBus.getDefault().post(musicStateEvent);
                     break;
                 case State.INVALID:
                     break;
                 case State.PAUSED:
-
                     break;
                 case State.PLAYING:
                     MusicStateEvent stateEvent = MusicStateEvent.getInstance();
@@ -339,12 +347,18 @@ public class MusicPlayerService extends Service {
         public void onPlaybackCompleted() {
             mPlayAdapter.reset(mPath);
             Log.d(TAG, "onPlaybackCompleted: ");
-
             isMusicFinished = true;
-            MusicStateEvent stateEvent = MusicStateEvent.getInstance();
-            stateEvent.setState(MusicState.State.COMPLETED);
-            EventBus.getDefault().post(stateEvent);
-            EventBus.getDefault().post(new RandomMusicEvent());
+            if (playingRandomMusic) {
+                MusicStateEvent stateEvent = MusicStateEvent.getInstance();
+                stateEvent.setState(MusicState.State.COMPLETED);
+                EventBus.getDefault().post(stateEvent);
+                EventBus.getDefault().post(new RandomMusicEvent());
+            }else {
+                mPlayAdapter.pause();
+                MusicStateEvent musicStateEvent = MusicStateEvent.getInstance();
+                musicStateEvent.setState(MusicState.State.COMPLETED);
+                EventBus.getDefault().post(musicStateEvent);
+            }
             super.onPlaybackCompleted();
         }
 

@@ -8,4 +8,5 @@ package com.carter.graduation.design.music.global;
 public class GlobalConstants {
     public static final String IS_FIRST_USE = "is_first_use";
     private static final String CURRENT_MUSIC = "current_music";
+    public static String IS_RANDOM = "is_random";
 }

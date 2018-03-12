@@ -45,6 +45,7 @@ import com.carter.graduation.design.music.event.MusicStartEvent;
 import com.carter.graduation.design.music.event.MusicStateEvent;
 import com.carter.graduation.design.music.event.NextMusicEvent;
 import com.carter.graduation.design.music.event.PlayOrPauseEvent;
+import com.carter.graduation.design.music.event.PlayingWayEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
 import com.carter.graduation.design.music.event.RandomMusicEven;
 import com.carter.graduation.design.music.event.RandomMusicEvent;
@@ -142,6 +143,7 @@ public class MusicFragment extends Fragment {
     private MusicInfo mMusicInfoCurrent;
     //    private int mPauseProgress;
     private int mCurrentPlayingPosition;
+    private boolean mRandom;
 
   /*  public static MusicFragment newInstance(ArrayList<MusicInfo> musicInfos, String param2) {
         MusicFragment fragment = new MusicFragment();
@@ -546,10 +548,13 @@ public class MusicFragment extends Fragment {
         int state = stateEvent.getState();
         switch (state) {
             case MusicState.State.COMPLETED:
-                if (isPlaying) {
-                    changeMusicState();
+                if (mRandom) {
+                    mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+                    isPlaying =true;
+                }else {
+                    mIvPlay.setImageResource(R.drawable.widget_play_selector);
+                    isPlaying =false;
                 }
-
                 break;
             case MusicState.State.CONTINUE_PLAYING:
                 break;
@@ -611,12 +616,22 @@ public class MusicFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getMusicWayEvent(PlayingWayEvent playingWayEvent){
+        mRandom = playingWayEvent.isRandom();
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetRandomMusic(RandomMusicEvent randomMusicEvent) {
-        MusicInfo randomPlayMusic = randomPlayMusic();
-        playMusic(randomPlayMusic, MusicState.State.PLAYING);
-        RandomMusicEven instance = RandomMusicEven.getInstance();
-        instance.setMusicInfo(randomPlayMusic);
-        EventBus.getDefault().post(instance);
+        if (mRandom) {
+            MusicInfo randomPlayMusic = randomPlayMusic();
+            playMusic(randomPlayMusic, MusicState.State.PLAYING);
+            RandomMusicEven instance = RandomMusicEven.getInstance();
+            instance.setMusicInfo(randomPlayMusic);
+            EventBus.getDefault().post(instance);
+        }else {
+            mIvPlay.setImageResource(R.drawable.widget_play_selector);
+            isPlaying = false;
+        }
+
     }
 
     @Override

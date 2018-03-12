@@ -14,13 +14,11 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ActionProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -32,34 +30,29 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.carter.graduation.design.music.R;
-import com.carter.graduation.design.music.event.MusicArrayListEvent;
+import com.carter.graduation.design.music.event.PlayingWayEvent;
 import com.carter.graduation.design.music.fragment.MusicDynamicFragment;
 import com.carter.graduation.design.music.fragment.MusicFragment;
-import com.carter.graduation.design.music.fragment.SearchMusicFragment;
 import com.carter.graduation.design.music.fragment.TimingFragment;
-import com.carter.graduation.design.music.info.MusicInfo;
+import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.receiver.HeadsetReceiver;
 import com.carter.graduation.design.music.service.MusicPlayerService;
-import com.carter.graduation.design.music.utils.MusicUtils;
+import com.carter.graduation.design.music.utils.SpUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
+/**
+ * 应用主界面
+ */
 public class HomeDetailActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MusicDynamicFragment.OnFragmentInteractionListener {
 
+    private boolean isRandom;
     private static final String TAG = "HomeDetailActivity";
     private ArrayList<ImageView> tabs = new ArrayList<>();
     private ImageView barnet, barmusic;
@@ -76,6 +69,7 @@ public class HomeDetailActivity extends BaseActivity
         }
     };
     private Context mContext;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +80,16 @@ public class HomeDetailActivity extends BaseActivity
         bindService();
         bindReceiver();
         initView();
+        initUse();
+    }
 
+    private void initUse() {
+        isRandom= (boolean) SpUtils.get(mContext, GlobalConstants.IS_RANDOM,false);
+        getThePlayWay(mFab);
+        SpUtils.put(mContext,GlobalConstants.IS_RANDOM,isRandom);
+        PlayingWayEvent wayEvent = PlayingWayEvent.getInstance();
+        wayEvent.setRandom(isRandom);
+        EventBus.getDefault().post(wayEvent);
     }
 
     private void initView() {
@@ -104,12 +107,18 @@ public class HomeDetailActivity extends BaseActivity
         toolbar.setTitle("我的音乐");
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
+
+                PlayingWayEvent wayEvent = PlayingWayEvent.getInstance();
+                getThePlayWay(mFab);
+                SpUtils.put(mContext,GlobalConstants.IS_RANDOM,isRandom);
+                wayEvent.setRandom(isRandom);
+                EventBus.getDefault().post(wayEvent);
             }
         });
 
@@ -137,6 +146,18 @@ public class HomeDetailActivity extends BaseActivity
             }
         });
 
+    }
+
+    private void getThePlayWay(FloatingActionButton fab) {
+        if (isRandom) {
+            isRandom =false;
+            fab.setImageResource(R.drawable.single);
+            Toast.makeText(mContext, "单曲播放", Toast.LENGTH_SHORT).show();
+        }else {
+            isRandom = true;
+            fab.setImageResource(R.drawable.random);
+            Toast.makeText(mContext, "随机播放", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
