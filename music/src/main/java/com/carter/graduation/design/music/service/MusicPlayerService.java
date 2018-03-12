@@ -27,7 +27,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.Timer;
 
 
 public class MusicPlayerService extends Service {
@@ -36,9 +35,6 @@ public class MusicPlayerService extends Service {
     private static final String TAG = "MusicPlayerService";
     //通知id
     private static final int NOTIFICATION = 1;
-    private static final int PLAYING = 0;
-    private static final int PAUSE_PLAYING = 1;
-    private static final int CONTINUE_PLAYING = 2;
     //    private static MediaPlayer mMediaPlayer = null;
     /* @SuppressLint("HandlerLeak")
      private Handler mHandler = new Handler(){
@@ -59,8 +55,6 @@ public class MusicPlayerService extends Service {
      };*/
     //当前播放歌曲
 //    private static int currentPos;
-    private boolean isRandom = false;
-    private boolean isMusicChanged = false;
     private boolean isMusicFinished = false;
 //    private Timer mTimer = new Timer();
     /**
@@ -263,9 +257,10 @@ public class MusicPlayerService extends Service {
 //        new Thread(this).start();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void getPlayingWayEvent(PlayingWayEvent playingWayEvent){
         playingRandomMusic = playingWayEvent.isRandom();
+        Log.d(TAG, "getPlayingWayEvent: "+playingRandomMusic);
     }
     //有点意思  事件的重复导致的之前的问题吗？？？？？？？？？？、、、、、
     @Subscribe(threadMode = ThreadMode.MAIN)

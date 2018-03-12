@@ -85,6 +85,7 @@ public class HomeDetailActivity extends BaseActivity
 
     private void initUse() {
         isRandom= (boolean) SpUtils.get(mContext, GlobalConstants.IS_RANDOM,false);
+        Log.d(TAG, "initUse: "+isRandom);
         if (isRandom){
             mFab.setImageResource(R.drawable.random);
         }else {
@@ -92,7 +93,7 @@ public class HomeDetailActivity extends BaseActivity
         }
         PlayingWayEvent wayEvent = PlayingWayEvent.getInstance();
         wayEvent.setRandom(isRandom);
-        EventBus.getDefault().post(wayEvent);
+        EventBus.getDefault().postSticky(wayEvent);
     }
 
     private void initView() {
