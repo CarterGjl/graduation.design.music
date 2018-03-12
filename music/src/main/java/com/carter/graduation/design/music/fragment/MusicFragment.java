@@ -405,7 +405,7 @@ public class MusicFragment extends Fragment {
                     changeMusicState();
 
                     mMusicInfoCurrent = mMusicInfos.get(0);
-                    playMusic(mMusicInfos.get(0), MusicState.State.PLAYING);
+                    playMusic(mMusicInfoCurrent, MusicState.State.PLAYING);
                 } else {
                     if (!isPlaying) {
                         Log.d(TAG, "onClick: " + "继续");
@@ -532,13 +532,25 @@ public class MusicFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetPlayOrPause(PlayOrPauseEvent playOrPauseEvent){
-        isAppRunning = !playOrPauseEvent.isAppRunning();
         isPlaying = playOrPauseEvent.isPlaying();
-        if (isPlaying) {
+        Log.d(TAG, "onGetPlayOrPause: "+isPlaying);
+        if (!isAppRunning) {
             playMusic(mMusicInfoCurrent,MusicState.State.PLAYING);
+            mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+            isAppRunning = true;
         }else {
-            playMusic(mMusicInfoCurrent,MusicState.State.PAUSED);
+            if (isPlaying) {
+                Log.d(TAG, "onClick: " + "继续");
+                playMusic(mMusicInfoCurrent, MusicState.State.CONTINUE_PLAYING);
+                mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+                Log.d(TAG, "onClick: " + isPlaying);
+            } else {
+                Log.d(TAG, "onClick: " + isPlaying);
+                mIvPlay.setImageResource(R.drawable.widget_play_selector);
+                playMusic(mMusicInfoCurrent, MusicState.State.PAUSED);
+            }
         }
+
 
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -622,9 +634,6 @@ public class MusicFragment extends Fragment {
     }
 
 
-   /* public interface OnFragmentInteractionListener {
-//        void onFragmentInteraction();
-    }*/
 
     class MusicInfoAdapter extends RecyclerView.Adapter<MusicInfoAdapter.ViewHolder> {
 

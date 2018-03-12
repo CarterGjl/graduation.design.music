@@ -42,7 +42,7 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
 
 
     private boolean mUserIsSeeking = false;
-    private boolean mIsPlaying;
+    private boolean mIsPlaying  = false;
     private ArrayList<MusicInfo> mMusicInfos;
     private int mCurrentPos;
     private boolean mIsAppRunning;
@@ -160,15 +160,8 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.iv_play_or_pause:
                 //播放
-                if (mIsPlaying) {
-                    mIvPlayOrPause.setImageResource(R.drawable.widget_play_selector);
-                    mIsPlaying = false;
-                }else {
-                    mIsPlaying = true;
-                    mIvPlayOrPause.setImageResource(R.drawable.widget_pause_selector);
-                }
+                changeMusicPlayState();
                 PlayOrPauseEvent instance1 = PlayOrPauseEvent.getInstance();
-
                 instance1.setAppRunning(mIsAppRunning);
                 instance1.setPlaying(mIsPlaying);
                 EventBus.getDefault().post(instance1);
@@ -183,6 +176,16 @@ public class PlayDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             default:
                 break;
+        }
+    }
+
+    private void changeMusicPlayState() {
+        if (!mIsPlaying){
+            mIvPlayOrPause.setImageResource(R.drawable.widget_pause_selector);
+            mIsPlaying = true;
+        }else {
+            mIvPlayOrPause.setImageResource(R.drawable.widget_play_selector);
+            mIsPlaying = false;
         }
     }
 
