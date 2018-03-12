@@ -365,8 +365,16 @@ public class MusicFragment extends Fragment {
         mSplMusic.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                showProgressDialog();
-                scanLocalMusic();
+                if (ContextCompat.checkSelfPermission(UiUtil.getContext(), Manifest.permission
+                        .READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest
+                            .permission.READ_EXTERNAL_STORAGE}, 1);
+                } else {
+                    //扫描本地歌曲库并显示  注意需要权限
+                    showProgressDialog();
+                    scanLocalMusic();
+                }
+
             }
         });
         mIvPre.setOnClickListener(new View.OnClickListener() {

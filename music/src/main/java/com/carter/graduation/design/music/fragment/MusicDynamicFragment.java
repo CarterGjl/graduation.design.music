@@ -3,6 +3,7 @@ package com.carter.graduation.design.music.fragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ public class MusicDynamicFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private Context mContext;
     private StellarMap mStellarMap;
+    private ArrayList<MusicInfo> mMusicInfos = new ArrayList<>();
 
     public MusicDynamicFragment() {
         // Required empty public constructor
@@ -52,6 +54,7 @@ public class MusicDynamicFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,12 +82,14 @@ public class MusicDynamicFragment extends Fragment {
         int padding = UiUtil.dip2px(10);
         mStellarMap.setInnerPadding(padding, padding, padding, padding);
         //设置页面
-
+        mStellarMap.setAdapter(new RecommendAdapter(mMusicInfos));
         ShakeListener shakeListener = new ShakeListener(UiUtil.getContext());
         shakeListener.setOnShakeListener(new ShakeListener.OnShakeListener() {
             @Override
             public void onShake() {
-                mStellarMap.zoomIn();
+                if (mMusicInfos != null) {
+                    mStellarMap.zoomIn();
+                }
             }
         });
     }
@@ -92,11 +97,9 @@ public class MusicDynamicFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMusicArrayListEvent(MusicArrayListEvent musicArrayListEvent) {
         if (musicArrayListEvent != null) {
-            ArrayList<MusicInfo> musicInfos = musicArrayListEvent.getMusicInfos();
-            if (musicInfos != null) {
-                mStellarMap.setAdapter(new RecommendAdapter(musicInfos));
-                mStellarMap.setGroup(0, true);
-            }
+            mMusicInfos = musicArrayListEvent.getMusicInfos();
+            mStellarMap.setAdapter(new RecommendAdapter(mMusicInfos));
+            mStellarMap.setGroup(0, true);
         }
     }
 
@@ -184,19 +187,21 @@ public class MusicDynamicFragment extends Fragment {
 
         @Override
         public int getNextGroupOnZoom(int group, boolean isZoomIn) {
-            if (isZoomIn) {
-                //下滑上一页
-                if (group > 0) {
-                    group--;
+            if (mMusicInfos != null) {
+                if (isZoomIn) {
+                    //下滑上一页
+                    if (group > 0) {
+                        group--;
+                    } else {
+                        group = getGroupCount() - 1;
+                    }
                 } else {
-                    group = getGroupCount() - 1;
-                }
-            } else {
-                //下滑
-                if (group < getGroupCount() - 1) {
-                    group++;
-                } else {
-                    group = 0;
+                    //下滑
+                    if (group < getGroupCount() - 1) {
+                        group++;
+                    } else {
+                        group = 0;
+                    }
                 }
             }
             return group;
