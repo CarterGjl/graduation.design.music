@@ -344,9 +344,7 @@ public class MusicPlayerService extends Service {
             Log.d(TAG, "onPlaybackCompleted: ");
             isMusicFinished = true;
             if (playingRandomMusic) {
-                MusicStateEvent stateEvent = MusicStateEvent.getInstance();
-                stateEvent.setState(MusicState.State.COMPLETED);
-                EventBus.getDefault().post(stateEvent);
+                Log.d(TAG, "ran: ");
                 EventBus.getDefault().post(new RandomMusicEvent());
             }else {
                 mPlayAdapter.pause();

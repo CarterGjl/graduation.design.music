@@ -615,7 +615,7 @@ public class MusicFragment extends Fragment {
         return position;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void getMusicWayEvent(PlayingWayEvent playingWayEvent){
         mRandom = playingWayEvent.isRandom();
     }
