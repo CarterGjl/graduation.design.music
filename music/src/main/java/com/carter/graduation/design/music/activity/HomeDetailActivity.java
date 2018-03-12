@@ -85,8 +85,11 @@ public class HomeDetailActivity extends BaseActivity
 
     private void initUse() {
         isRandom= (boolean) SpUtils.get(mContext, GlobalConstants.IS_RANDOM,false);
-        getThePlayWay(mFab);
-        SpUtils.put(mContext,GlobalConstants.IS_RANDOM,isRandom);
+        if (isRandom){
+            mFab.setImageResource(R.drawable.random);
+        }else {
+            mFab.setImageResource(R.drawable.single);
+        }
         PlayingWayEvent wayEvent = PlayingWayEvent.getInstance();
         wayEvent.setRandom(isRandom);
         EventBus.getDefault().post(wayEvent);
