@@ -48,6 +48,7 @@ import com.carter.graduation.design.music.event.PlayOrPauseEvent;
 import com.carter.graduation.design.music.event.PreMusicEvent;
 import com.carter.graduation.design.music.event.RandomMusicEven;
 import com.carter.graduation.design.music.event.RandomMusicEvent;
+import com.carter.graduation.design.music.event.SearchMusicInfoEvent;
 import com.carter.graduation.design.music.global.GlobalConstants;
 import com.carter.graduation.design.music.info.MusicInfo;
 import com.carter.graduation.design.music.player.MusicState;
@@ -76,16 +77,10 @@ public class MusicFragment extends Fragment {
     //当前正在播放的音乐的位置  初始化为0
     private static int currentPos = 0;
     private boolean isAppRunning = false;
-    //    private static final int IS_PLAYING = 2;
     private int currentMusicID = -1;
     private boolean isPlaying = false;
-    /**
-     * 音乐是否改变了 默认改变
-     */
-//    private boolean isMusicFinished = false;
     private ProgressDialog mProgressDialog;
     private SwipeRefreshLayout mSplMusic;
-    //    private OnFragmentInteractionListener mListener;
     private ArrayList<MusicInfo> mMusicInfos;
     private Context mContext;
     private RecyclerView mRvSongListView;
@@ -260,18 +255,11 @@ public class MusicFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
     }
 
     @Override
@@ -344,7 +332,6 @@ public class MusicFragment extends Fragment {
     }
 
     private void showShare(String info,String url) {
-        // TODO: 2018/1/26 需要完成歌曲的分享 、
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
@@ -468,14 +455,15 @@ public class MusicFragment extends Fragment {
         }
     }
 
-    /*  private void playMusic(String path,int musicState) {
+    @Deprecated
+      private void playMusic(String path,int musicState) {
           //单例用于
           MusicEvent instance = MusicEvent.getInstance();
           instance.setPath(path);
           // 0 表示开始播放 1 暂停  2  继续
           instance.setMusicState(musicState);
           EventBus.getDefault().post(instance);
-      }*/
+      }
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -598,6 +586,28 @@ public class MusicFragment extends Fragment {
         int currentPosition = instance.getCurrentPosition();
         Log.d(TAG, "onGetMusicPositionEvent: " + currentPosition);
         mPbProgress.setProgress(currentPosition);
+    }
+
+    @Subscribe (threadMode = ThreadMode.MAIN)
+    public void playSearchMusicEvent(SearchMusicInfoEvent searchMusicInfoEvent){
+        MusicInfo musicInfo = searchMusicInfoEvent.getMusicInfo();
+        isPlaying = true;
+        isAppRunning = true;
+        int position = getPlayingMusicPosition(musicInfo);
+        mMusicInfoAdapter.setSelectItem(position);
+        playMusic(musicInfo,MusicState.State.PLAYING);
+        mIvPlay.setImageResource(R.drawable.widget_pause_selector);
+}
+
+    private int getPlayingMusicPosition(MusicInfo musicInfo) {
+        int id = musicInfo.getId();
+        int position = 0;
+        for (int i = 0; i < mMusicInfos.size(); i++) {
+            if (mMusicInfos.get(i).getId() == id){
+                position = i;
+            }
+        }
+        return position;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -773,6 +783,7 @@ public class MusicFragment extends Fragment {
             }
         }
     }
+
     /*    @SuppressLint("NewApi")
     private void playMusic(MusicInfo musicInfo, int musicState) {
         //单例用于

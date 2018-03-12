@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 public class LocalSearchActivity extends AppCompatActivity {
 
-    private SearchView mSearchView;
     private SearchAdapter mSearchAdapter;
 
     private static final String TAG = "LocalSearchActivity";
