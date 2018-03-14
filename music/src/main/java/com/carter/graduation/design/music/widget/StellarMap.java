@@ -309,13 +309,13 @@ public class StellarMap extends FrameLayout implements AnimationListener, OnTouc
     /**
      * 内部类、接口
      */
-    public static interface Adapter {
-        public abstract int getGroupCount();
+    public interface Adapter {
+        int getGroupCount();
 
-        public abstract int getCount(int group);
+        int getCount(int group);
 
-        public abstract View getView(int group, int position, View convertView);
+        View getView(int group, int position, View convertView);
 
-        public abstract int getNextGroupOnZoom(int group, boolean isZoomIn);
+        int getNextGroupOnZoom(int group, boolean isZoomIn);
     }
 }

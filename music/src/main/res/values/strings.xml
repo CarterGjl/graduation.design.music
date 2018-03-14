@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">music</string>
+    <string name="app_name">糕糕</string>
     <string name="title_activity_home_detail">HomeDetailActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

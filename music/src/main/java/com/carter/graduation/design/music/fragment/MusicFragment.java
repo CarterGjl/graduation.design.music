@@ -340,14 +340,12 @@ public class MusicFragment extends Fragment {
         // title标题，微信、QQ和QQ空间等平台使用
         //oks.setTitle(getString());
         // titleUrl QQ和QQ空间跳转链接
-        oks.setTitle("来自carter的分享");
+        oks.setTitle("音乐分享");
         //oks.setTitleUrl("http://www.baidu.com");
         // text是分享文本，所有平台都需要这个字段
-        oks.setText(info);
+        oks.setText("正在听的音乐："+info);
         oks.setSite(getString(R.string.app_name));
-        oks.setFilePath(Environment.getExternalStorageDirectory()+url);
-        Log.d(TAG, "showShare: "+Environment.getExternalStorageDirectory());
-        Log.d(TAG, "showShare: "+Environment.getExternalStorageDirectory()+url);
+        oks.setTitleUrl("http://www.baidu.com");
         // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
         //oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
         // url在微信、微博，Facebook等平台中使用
@@ -465,7 +463,7 @@ public class MusicFragment extends Fragment {
         }
     }
 
-    @Deprecated
+   /* @Deprecated
       private void playMusic(String path,int musicState) {
           //单例用于
           MusicEvent instance = MusicEvent.getInstance();
@@ -473,7 +471,7 @@ public class MusicFragment extends Fragment {
           // 0 表示开始播放 1 暂停  2  继续
           instance.setMusicState(musicState);
           EventBus.getDefault().post(instance);
-      }
+      }*/
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -538,12 +536,9 @@ public class MusicFragment extends Fragment {
             isAppRunning = true;
         }else {
             if (isPlaying) {
-                Log.d(TAG, "onClick: " + "继续");
                 playMusic(mMusicInfoCurrent, MusicState.State.CONTINUE_PLAYING);
                 mIvPlay.setImageResource(R.drawable.widget_pause_selector);
-                Log.d(TAG, "onClick: " + isPlaying);
             } else {
-                Log.d(TAG, "onClick: " + isPlaying);
                 mIvPlay.setImageResource(R.drawable.widget_play_selector);
                 playMusic(mMusicInfoCurrent, MusicState.State.PAUSED);
             }
@@ -713,9 +708,6 @@ public class MusicFragment extends Fragment {
                     holder.ivPlayState.setVisibility(View.GONE);
                 }
             }
-//            holder.ivMusic.setImageResource();
-           /* Glide.with(mContext).load(MusicUtils.getArtwork(mContext, musicInfo.getId(),
-                    musicInfo.getAlbum_id(), true, true)).into(holder.ivMusic);*/
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -723,7 +715,7 @@ public class MusicFragment extends Fragment {
                     currentPos = position;
                     setSelectItem(position);
                     int id = musicInfo.getId();
-                    Log.d(TAG, "onClick: " + id);
+                    Log.d(TAG, "歌曲id: " + id);
                     if (isPlaying && currentMusicID == id) {
                         mIntent.putExtra("duration", DurationEvent.getDuration());
                         mIntent.putExtra("musicInfo", mMusicInfoCurrent);

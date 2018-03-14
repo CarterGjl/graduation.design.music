@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -234,9 +236,19 @@ public class HomeDetailActivity extends BaseActivity
         MenuItem item = menu.findItem(R.id.action_share);
         ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
         Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "abc");
-        sendIntent.setType("text/plain");
+        try {
+            String appDir = getPackageManager().getApplicationInfo("com.carter.graduation.design.music", 0)
+                    .sourceDir;
+            appDir = "//"+appDir;
+            Uri uri = Uri.parse(appDir);
+
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            sendIntent.setType("*/*");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         shareActionProvider.setShareIntent(sendIntent);
         return true;
     }
@@ -257,9 +269,6 @@ public class HomeDetailActivity extends BaseActivity
             case R.id.nav_about_app:
                 Intent intent = new Intent(this, AboutAppActivity.class);
                 startActivity(intent);
-                break;
-            case R.id.nav_gallery:
-
                 break;
             case R.id.nav_slideshow:
                 TimingFragment timingFragment = new TimingFragment();

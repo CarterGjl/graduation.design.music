@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.info.MusicInfo;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 
 public class MusicUtils {
 
+    private static final String TAG = "MusicUtils";
     private static final Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
     public static ArrayList<MusicInfo> scanAllMusicFiles() {
         ArrayList<MusicInfo> musicInfos = new ArrayList<>();
@@ -48,7 +50,8 @@ public class MusicUtils {
                 int albumId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
                         .ALBUM_ID));
                 String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ARTIST));
+                        .ARTIST_ID));
+                Log.d(TAG, "scanAllMusicFiles: "+artist);
                 String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
                         .DATA));
                 int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
@@ -79,7 +82,7 @@ public class MusicUtils {
      * 将毫秒转换为分:秒格式
      *
      * @param time 需要格式化的时间
-     * @return
+     * @return format time
      */
     public static String formatTime(long time) {
         String min = time / (1000 * 60) + "";
@@ -104,11 +107,11 @@ public class MusicUtils {
     /**
      * 获取默认专辑图片
      *
-     * @param context
-     * @return
+     * @param context context
+     * @return bitmap
      */
     @SuppressLint("ResourceType")
-    public static Bitmap getDefaultArtwork(Context context, boolean small) {
+    private static Bitmap getDefaultArtwork(Context context, boolean small) {
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPreferredConfig = Bitmap.Config.RGB_565;
         if (small) {  //返回小图片
@@ -206,7 +209,6 @@ public class MusicUtils {
                 options.inJustDecodeBounds = true;
                 //调用此方法得到options得到图片的大小
                 BitmapFactory.decodeStream(in, null, options);
-                /** 我们的目标是在你N pixel的画面上显示。 所以需要调用computeSampleSize得到图片缩放的比例 **/
                 /** 这里的target为800是根据默认专辑图片大小决定的，800只是测试数字但是试验后发现完美的结合 **/
                 if (small) {
                     options.inSampleSize = computeSampleSize(options, 40);
@@ -252,7 +254,7 @@ public class MusicUtils {
      * @param target
      * @return
      */
-    public static int computeSampleSize(BitmapFactory.Options options, int target) {
+    private static int computeSampleSize(BitmapFactory.Options options, int target) {
         int w = options.outWidth;
         int h = options.outHeight;
         int candidateW = w / target;
@@ -272,51 +274,5 @@ public class MusicUtils {
             }
         }
         return candidate;
-    }
-    public static HashSet<MusicInfo> queryMusic(Context context,String key){
-        HashSet<MusicInfo> musicList = new HashSet<>();
-        Cursor cursor = null;
-        cursor= context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,
-                MediaStore.Audio.Media.DISPLAY_NAME + " LIKE '%" + key + "%'",null,MediaStore.Audio
-                        .Media.DEFAULT_SORT_ORDER);
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        ._ID));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ALBUM));
-                int albumId = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ALBUM_ID));
-                String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .ARTIST));
-                String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .DATA));
-                int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .DURATION));
-                long size = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media
-                        .SIZE));
-
-                if (size > 1024 * 80) {
-                    //大于80k
-                    MusicInfo musicInfo = new MusicInfo();
-                    musicInfo.setId(id);
-                    musicInfo.setAlbum(album);
-                    musicInfo.setDuration(duration);
-                    musicInfo.setSize(size);
-                    musicInfo.setTitle(title);
-                    musicInfo.setUrl(url);
-                    musicInfo.setAlbum_id(albumId);
-                    musicList.add(musicInfo);
-                }
-                cursor.moveToNext();
-            }
-        }
-        return musicList;
-    }
-    public static boolean isExists(String path) {
-        File file = new File(path);
-        return file.exists();
     }
 }

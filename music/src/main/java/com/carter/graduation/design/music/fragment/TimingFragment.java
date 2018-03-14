@@ -16,14 +16,11 @@ import com.carter.graduation.design.music.R;
 import com.carter.graduation.design.music.TimerExit;
 
 /**
- * Created by newthinkpad on 2018/1/30.
+ * Created by newthinkpad on 2018/1/30
  */
 
 public class TimingFragment extends DialogFragment implements View.OnClickListener {
     private Context mContext;
-
-    private TextView timing10, timing20, timing30, timing45, timing60, timing90;
-    private TimerExit mTimerExit;
 
     @Override
     public void onAttach(Activity activity) {
@@ -37,12 +34,12 @@ public class TimingFragment extends DialogFragment implements View.OnClickListen
         //设置无标题
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         View view = inflater.inflate(R.layout.fragment_timing, container, false);
-        timing10 = (TextView) view.findViewById(R.id.timing_10min);
-        timing20 = (TextView) view.findViewById(R.id.timing_20min);
-        timing30 = (TextView) view.findViewById(R.id.timing_30min);
-        timing45 = (TextView) view.findViewById(R.id.timing_45min);
-        timing60 = (TextView) view.findViewById(R.id.timing_60min);
-        timing90 = (TextView) view.findViewById(R.id.timing_90min);
+        TextView timing10 = view.findViewById(R.id.timing_10min);
+        TextView timing20 = view.findViewById(R.id.timing_20min);
+        TextView timing30 = view.findViewById(R.id.timing_30min);
+        TextView timing45 = view.findViewById(R.id.timing_45min);
+        TextView timing60 = view.findViewById(R.id.timing_60min);
+        TextView timing90 = view.findViewById(R.id.timing_90min);
 
         timing10.setOnClickListener(this);
         timing20.setOnClickListener(this);
@@ -70,42 +67,42 @@ public class TimingFragment extends DialogFragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        mTimerExit = TimerExit.getInstance();
+        TimerExit timerExit = TimerExit.getInstance();
         switch (v.getId()) {
 
             case R.id.timing_10min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(1);
+                timerExit.cancelTask();
+                timerExit.startTask(1);
                 Toast.makeText(mContext, "将在10分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
             case R.id.timing_20min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(20);
+                timerExit.cancelTask();
+                timerExit.startTask(20);
                 Toast.makeText(mContext, "将在20分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
             case R.id.timing_30min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(30);
+                timerExit.cancelTask();
+                timerExit.startTask(30);
                 Toast.makeText(mContext, "将在30分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
             case R.id.timing_45min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(45);
+                timerExit.cancelTask();
+                timerExit.startTask(45);
                 Toast.makeText(mContext, "将在45分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
             case R.id.timing_60min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(60);
+                timerExit.cancelTask();
+                timerExit.startTask(60);
                 Toast.makeText(mContext, "将在60分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
             case R.id.timing_90min:
-                mTimerExit.cancelTask();
-                mTimerExit.startTask(90);
+                timerExit.cancelTask();
+                timerExit.startTask(90);
                 Toast.makeText(mContext, "将在90分钟后停止播放", Toast.LENGTH_SHORT).show();
                 dismiss();
                 break;
