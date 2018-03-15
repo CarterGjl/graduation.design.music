@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../ConnectivitySample_Phone-master/ConnectivitySample_Phone-master.iml" filepath="$PROJECT_DIR$/../ConnectivitySample_Phone-master/ConnectivitySample_Phone-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../EmojiVoiceSample-master/EmojiVoiceSample-master.iml" filepath="$PROJECT_DIR$/../EmojiVoiceSample-master/EmojiVoiceSample-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../LocomotionSample-master/LocomotionSample-master.iml" filepath="$PROJECT_DIR$/../LocomotionSample-master/LocomotionSample-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../MyApplication.iml" filepath="$PROJECT_DIR$/../MyApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SpeechSample-master/SpeechSample-master.iml" filepath="$PROJECT_DIR$/../SpeechSample-master/SpeechSample-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../VisionSample-master/VisionSample-master.iml" filepath="$PROJECT_DIR$/../VisionSample-master/VisionSample-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../aidldemoService/aidldemoService.iml" filepath="$PROJECT_DIR$/../aidldemoService/aidldemoService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../aidldemoclient/aidldemoclient.iml" filepath="$PROJECT_DIR$/../aidldemoclient/aidldemoclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app.iml" filepath="$PROJECT_DIR$/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../demo6/demo6.iml" filepath="$PROJECT_DIR$/../demo6/demo6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../demoevent/demoevent.iml" filepath="$PROJECT_DIR$/../demoevent/demoevent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../jianshu-neteasedisc-master/jianshu-neteasedisc-master.iml" filepath="$PROJECT_DIR$/../jianshu-neteasedisc-master/jianshu-neteasedisc-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../music/music.iml" filepath="$PROJECT_DIR$/../music/music.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../music_master/music_master.iml" filepath="$PROJECT_DIR$/../music_master/music_master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../planedemo/planedemo.iml" filepath="$PROJECT_DIR$/../planedemo/planedemo.iml" />
+    </modules>
+  </component>
+</project>

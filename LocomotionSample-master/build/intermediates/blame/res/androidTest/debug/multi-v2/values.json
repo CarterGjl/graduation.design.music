@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\newthinkpad\\.gradle\\caches\\transforms-1\\files-1.1\\headsdk-0.6.202.aar\\75653dc6d05fc868e19130016389a291\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "44",
+                        "endOffsets": "95"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\newthinkpad\\.gradle\\caches\\transforms-1\\files-1.1\\headsdk-0.6.202.aar\\75653dc6d05fc868e19130016389a291\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "44",
+                        "endOffsets": "95"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/.." />
+            <option value="$PROJECT_DIR$/../ConnectivitySample_Phone-master" />
+            <option value="$PROJECT_DIR$/../EmojiVoiceSample-master" />
+            <option value="$PROJECT_DIR$/../LocomotionSample-master" />
+            <option value="$PROJECT_DIR$/../SpeechSample-master" />
+            <option value="$PROJECT_DIR$/../VisionSample-master" />
+            <option value="$PROJECT_DIR$/../aidldemoService" />
+            <option value="$PROJECT_DIR$/../aidldemoclient" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/../demo6" />
+            <option value="$PROJECT_DIR$/../demoevent" />
+            <option value="$PROJECT_DIR$/../jianshu-neteasedisc-master" />
+            <option value="$PROJECT_DIR$/../music" />
+            <option value="$PROJECT_DIR$/../music_master" />
+            <option value="$PROJECT_DIR$/../planedemo" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

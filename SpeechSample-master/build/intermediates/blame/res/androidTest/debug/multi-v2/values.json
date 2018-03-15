@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\SpeechSample-master\\build\\intermediates\\incremental\\mergeDebugAndroidTestResources\\merged.dir\\values\\values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\newthinkpad\\.gradle\\caches\\transforms-1\\files-1.1\\speech-sdk-0.5.171.aar\\53759a879d3ba5acbb5a15daa9a697d7\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "49",
+                        "endOffsets": "100"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\SpeechSample-master\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\newthinkpad\\.gradle\\caches\\transforms-1\\files-1.1\\speech-sdk-0.5.171.aar\\53759a879d3ba5acbb5a15daa9a697d7\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "49",
+                        "endOffsets": "100"
+                    }
+                }
+            ]
+        }
+    ]
+}

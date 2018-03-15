@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\debug\\layout\\navigation_fragment.xml",
+        "source": "F:\\workspace\\MyApplication\\LocomotionSample-master\\src\\main\\res\\layout\\navigation_fragment.xml"
+    },
+    {
+        "merged": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\debug\\layout\\fragment_base.xml",
+        "source": "F:\\workspace\\MyApplication\\LocomotionSample-master\\src\\main\\res\\layout\\fragment_base.xml"
+    },
+    {
+        "merged": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\debug\\layout\\activity_head.xml",
+        "source": "F:\\workspace\\MyApplication\\LocomotionSample-master\\src\\main\\res\\layout\\activity_head.xml"
+    },
+    {
+        "merged": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\debug\\layout\\activity_base.xml",
+        "source": "F:\\workspace\\MyApplication\\LocomotionSample-master\\src\\main\\res\\layout\\activity_base.xml"
+    },
+    {
+        "merged": "F:\\workspace\\MyApplication\\LocomotionSample-master\\build\\intermediates\\res\\merged\\debug\\layout\\activity_main.xml",
+        "source": "F:\\workspace\\MyApplication\\LocomotionSample-master\\src\\main\\res\\layout\\activity_main.xml"
+    }
+]

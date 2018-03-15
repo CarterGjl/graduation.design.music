@@ -1,0 +1,82 @@
+{
+    "logs": [
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\VisionSample-master\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "map": [
+                {
+                    "source": "F:\\workspace\\MyApplication\\VisionSample-master\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "4,2,3",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "153,55,102",
+                        "endColumns": "45,46,50",
+                        "endOffsets": "194,97,148"
+                    },
+                    "to": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,101,148",
+                        "endColumns": "45,46,50",
+                        "endOffsets": "96,143,194"
+                    }
+                },
+                {
+                    "source": "F:\\workspace\\MyApplication\\VisionSample-master\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "1,2,6,3,7,8,4,5",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "16,66,306,121,381,432,166,235",
+                        "endColumns": "49,54,74,44,50,50,68,70",
+                        "endOffsets": "61,116,376,161,427,478,230,301"
+                    },
+                    "to": {
+                        "startLines": "5,6,7,8,9,10,11,12",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "199,249,304,379,424,475,526,595",
+                        "endColumns": "49,54,74,44,50,50,68,70",
+                        "endOffsets": "244,299,374,419,470,521,590,661"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "F:\\workspace\\MyApplication\\VisionSample-master\\build\\intermediates\\res\\merged\\debug\\values\\values.xml",
+            "map": [
+                {
+                    "source": "F:\\workspace\\MyApplication\\VisionSample-master\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "4,2,3",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "153,55,102",
+                        "endColumns": "45,46,50",
+                        "endOffsets": "194,97,148"
+                    },
+                    "to": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,101,148",
+                        "endColumns": "45,46,50",
+                        "endOffsets": "96,143,194"
+                    }
+                },
+                {
+                    "source": "F:\\workspace\\MyApplication\\VisionSample-master\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "1,2,6,3,7,8,4,5",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "16,66,306,121,381,432,166,235",
+                        "endColumns": "49,54,74,44,50,50,68,70",
+                        "endOffsets": "61,116,376,161,427,478,230,301"
+                    },
+                    "to": {
+                        "startLines": "5,6,7,8,9,10,11,12",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "199,249,304,379,424,475,526,595",
+                        "endColumns": "49,54,74,44,50,50,68,70",
+                        "endOffsets": "244,299,374,419,470,521,590,661"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/Constants.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/Encrypt.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/ImageTools.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/L.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/LocalMusicUtils.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/MobileUtils.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/MusicIconLoader.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/MusicUtils.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/Utils/SpUtils.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/adapter/MusicListAdapter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/adapter/SearchResultAdapter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/applicantion/App.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/engine/Download.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/engine/GetDownloadInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/engine/SearchMusic.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/engine/SongsRecommendation.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/fragment/CdFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/fragment/CompassFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/fragment/LocalFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/fragment/SearchFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/fragment/UserFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/info/Music.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/info/SearchResult.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/mymusic/BaseActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/mymusic/MainActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/mymusic/PlayActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/mymusic/SplashActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/service/DownloadService.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/service/PlayService.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/ui/CDView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/ui/LrcView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/myMusic/src/main/java/zjn/ui/PagerIndicator.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/adapter/SearchResultAdapter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/engine/Download.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/engine/GetDownloadInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/engine/SearchMusic.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/engine/SongsRecommendation.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/fragment/LocalFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/fragment/SearchFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/info/Music.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/mymusic/BaseActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/mymusic/MainActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/mymusic/PlayActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/mymusic2/src/main/java/com/example/mymusic/zjn/mymusic/SplashActivity.java" charset="GBK" />
+  </component>
+</project>

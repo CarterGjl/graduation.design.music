@@ -1,0 +1,1 @@
+include ':app', ':demoevent', ':music', ':demo6', ':aidldemoService', ':aidldemoclient', ':demo', 'music_master', ':jianshu-neteasedisc-master'

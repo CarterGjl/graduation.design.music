@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.segway.robot:basesdk-0.6.202">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/basesdk-0.6.202.aar/04b54eaead7f3e8436630ccdb2703a78/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/basesdk-0.6.202.aar/04b54eaead7f3e8436630ccdb2703a78/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.segway.robot/basesdk/0.6.202/3c414a83dfddf2e959d0da0a5d0ab8d8bb2c4d33/basesdk-0.6.202-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
